@@ -3,170 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Forex P2P Squad</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: sans-serif; }
-    </style>
+    <title>Forex P2P Squad</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-[#0b0f19] text-gray-200 min-h-screen flex justify-center p-3">
+<body>
 
-    <div class="w-full max-w-md space-y-4 pb-10">
+    <div class="container">
         
-        <header class="flex items-center justify-between bg-[#111827] border border-gray-800 rounded-xl p-3 shadow-lg">
-            <div class="flex items-center space-x-2">
-                <div class="bg-[#10b981] text-[#0b0f19] w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg">
-                    <i class="fa-brands fa-litecoin"></i>
-                </div>
-                <span class="text-lg font-bold tracking-wide text-white">Forex P2P Squad</span>
-
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo-icon"></div>
+                <div class="logo-text">Forex P2P<br>Squad</div>
             </div>
-            <div class="flex space-x-2 text-xs">
-                <button class="bg-[#10b981] text-[#0b0f19] font-semibold px-3 py-1.5 rounded-md flex items-center space-x-1 hover:bg-[#059669] transition">
-                    <i class="fa-solid fa-user-lock"></i>
-                    <span>Login (ግባ)</span>
-                </button>
-                <button class="bg-gray-800 text-gray-300 px-3 py-1.5 rounded-md border border-gray-700 hover:bg-gray-700 transition">
-                    Register (ተመዝገብ)
-                </button>
+            <div class="auth-buttons">
+                <button class="btn-login">Login (ግባ)</button>
+                <button class="btn-register">Register (ተመዝገብ)</button>
             </div>
         </header>
 
-        <div class="grid grid-cols-2 gap-2 text-xs font-medium">
-            <button class="flex items-center justify-center space-x-2 bg-emerald-950/40 border border-emerald-500/30 text-[#10b981] py-2.5 rounded-xl">
-                <i class="fa-solid fa-house"></i>
-                <span>Home (ዋና ገጽ)</span>
-            </button>
-            <button class="flex items-center justify-center space-x-2 bg-[#111827] border border-gray-800 text-gray-400 py-2.5 rounded-xl hover:bg-gray-800/50 transition">
-                <i class="fa-solid fa-book-open"></i>
-                <span>Guide (መመሪያ)</span>
-            </button>
-        </div>
+        <nav class="nav-tabs">
+            <div class="tab active">🏠 Home (ዋና ገጽ)</div>
+            <div class="tab">📖 Guide (መመሪያ)</div>
+        </nav>
 
-        <section class="bg-[#111827] border border-gray-800/80 rounded-2xl p-4 space-y-3 shadow-md">
-            <div class="flex items-center space-x-2 text-gray-400 text-sm font-semibold">
-                <i class="fa-solid fa-chart-line text-[#10b981]"></i>
-                <h2>Withdrawal Rate</h2>
+        <section class="card">
+            <div class="card-title">
+                📈 Withdrawal Rate
             </div>
-            <div class="space-y-2 text-sm">
-                <div class="flex justify-between items-center bg-[#151f32] p-3 rounded-xl border border-gray-800/50">
-                    <span class="text-gray-400">Under 10 USDT</span>
-                    <span class="font-bold text-white">160 ETB</span>
-                </div>
-                <div class="flex justify-between items-center bg-[#151f32] p-3 rounded-xl border border-gray-800/50">
-                    <span class="text-gray-400">10+ USDT</span>
-                    <span class="font-bold text-[#10b981]">170 ETB</span>
-                </div>
+            <div class="rate-row">
+                <span class="rate-label">Under 10 USDT</span>
+                <span class="rate-value">160 ETB</span>
+            </div>
+            <div class="rate-row">
+                <span class="rate-label">10+ USDT</span>
+                <span class="rate-value">170 ETB</span>
             </div>
         </section>
 
-        <section class="bg-[#111827] border border-gray-800/80 rounded-2xl p-4 space-y-3 shadow-md">
-            <div class="flex items-center space-x-2 text-gray-400 text-sm font-semibold">
-                <i class="fa-solid fa-credit-card text-amber-500"></i>
-                <h2>Deposit Address (የማስቀመጫ አድራሻ)</h2>
+        <section class="card">
+            <div class="card-title">
+                💳 Deposit Address (የማስቀመጫ አድራሻ)
             </div>
-            <p class="text-xs text-gray-400 leading-relaxed">
+            <p style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 15px 0; line-height: 1.4;">
                 Generate your unique LTC deposit address (የራስዎን LTC አድራሻ ያውጡ)
             </p>
-            <button id="generateBtn" class="w-full bg-[#10b981] hover:bg-[#059669] text-[#0b0f19] font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/20 transition duration-200 text-sm flex items-center justify-center space-x-2">
-                <span>Generate Address (አድራሻ ፍጠር)</span>
-            </button>
-            
-            <div id="addressDisplay" class="hidden bg-gray-950 p-3 rounded-xl text-xs text-center border border-dashed border-gray-700 break-all text-emerald-400 select-all">
-                ltc1q34r...የተጠቃሚው_አድራሻ_እዚህ_ይወጣል
-            </div>
+            <button class="btn-generate">Generate Address (አድራሻ ፍጠር)</button>
         </section>
 
-        <section class="bg-[#111827] border border-gray-800/80 rounded-2xl p-4 space-y-3 shadow-md">
-            <div class="flex items-center space-x-2 text-gray-400 text-sm font-semibold">
-                <i class="fa-solid fa-trophy text-amber-500"></i>
-                <h2>Top Withdrawals (ታላላቅ ክፍያዎች)</h2>
+        <section class="card">
+            <div class="card-title">
+                🏆 Top Withdrawals (ታላላቅ ክፍያዎች)
             </div>
-            <p class="text-xs text-gray-400">
+            <p style="font-size: 0.8rem; color: #718096; margin: -10px 0 15px 0;">
                 Inspiring top earners! (ከፍተኛ ክፍያ ያገኙ ተጠቃሚዎች)
             </p>
 
-            <div class="space-y-2 pt-2">
-                
-                <div class="flex items-center justify-between bg-[#151f32] p-3 rounded-xl border border-gray-800/40">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-7 h-7 rounded-full bg-amber-500/10 border border-amber-500 text-amber-500 flex items-center justify-center font-bold text-xs">1</div>
-                        <div>
-                            <div class="text-xs font-semibold text-gray-200">Sen*** Hai***</div>
-                            <div class="text-[10px] text-gray-500">0976***87</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs font-bold text-[#10b981]">6,142 ETB <i class="fa-solid fa-trophy text-amber-500 text-[10px] ml-0.5"></i></div>
-                        <div class="text-[10px] text-gray-500">18 Payments</div>
+            <div class="user-item">
+                <div class="user-info">
+                    <div class="rank-badge">1</div>
+                    <div>
+                        <div class="username">Sen*** Hai***</div>
+                        <div class="user-sub">0976***87</div>
                     </div>
                 </div>
+                <div>
+                    <div class="amount-gold">6,142 ETB 🏆</div>
+                    <div class="user-sub" style="text-align: right;">18 Payments</div>
+                </div>
+            </div>
 
-                <div class="flex items-center justify-between bg-[#151f32] p-3 rounded-xl border border-gray-800/40">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-7 h-7 rounded-full bg-gray-400/10 border border-gray-400 text-gray-400 flex items-center justify-center font-bold text-xs">2</div>
-                        <div>
-                            <div class="text-xs font-semibold text-gray-200">Mua*** Abd***</div>
-                            <div class="text-[10px] text-gray-500">0938***47</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs font-bold text-[#10b981]">4,782 ETB <i class="fa-solid fa-trophy text-amber-500 text-[10px] ml-0.5"></i></div>
-                        <div class="text-[10px] text-gray-500">3 Payments</div>
+            <div class="user-item">
+                <div class="user-info">
+                    <div class="rank-badge">2</div>
+                    <div>
+                        <div class="username">Mua*** Abd***</div>
+                        <div class="user-sub">0938***47</div>
                     </div>
                 </div>
+                <div>
+                    <div class="amount-gold">4,782 ETB 🏆</div>
+                    <div class="user-sub" style="text-align: right;">3 Payments</div>
+                </div>
+            </div>
 
-                <div class="flex items-center justify-between bg-[#151f32] p-3 rounded-xl border border-gray-800/40">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-7 h-7 rounded-full bg-amber-700/10 border border-amber-700 text-amber-700 flex items-center justify-center font-bold text-xs">3</div>
+            <div class="user-item">
+                <div class="user-item-body" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                    <div class="user-info">
+                        <div class="rank-badge">3</div>
                         <div>
-                            <div class="text-xs font-semibold text-gray-200">Bam***</div>
-                            <div class="text-[10px] text-gray-500">0951***37</div>
+                            <div class="username">Bam***</div>
+                            <div class="user-sub">0951***37</div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-xs font-bold text-[#10b981]">3,718 ETB <i class="fa-solid fa-trophy text-amber-500 text-[10px] ml-0.5"></i></div>
-                        <div class="text-[10px] text-gray-500">24 Payments</div>
+                    <div>
+                        <div class="amount-gold">3,718 ETB 🏆</div>
+                        <div class="user-sub" style="text-align: right;">24 Payments</div>
                     </div>
                 </div>
+            </div>
 
-                <div class="flex items-center justify-between bg-[#151f32] p-3 rounded-xl border border-gray-800/40">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-7 h-7 rounded-full bg-gray-800 text-gray-400 flex items-center justify-center font-bold text-xs">4</div>
-                        <div>
-                            <div class="text-xs font-semibold text-gray-200">fil***</div>
-                            <div class="text-[10px] text-gray-500">0936***72</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs font-bold text-[#10b981]">3,389 ETB <i class="fa-solid fa-trophy text-amber-500 text-[10px] ml-0.5"></i></div>
-                        <div class="text-[10px] text-gray-500">21 Payments</div>
+            <div class="user-item" style="border-bottom: none;">
+                <div class="user-info">
+                    <div class="rank-badge" style="border-color: #718096; color: #a0aec0;">4</div>
+                    <div>
+                        <div class="username">fil***</div>
+                        <div class="user-sub">0936***72</div>
                     </div>
                 </div>
-
+                <div>
+                    <div class="amount-gold">3,389 ETB 🏆</div>
+                    <div class="user-sub" style="text-align: right;">21 Payments</div>
+                </div>
             </div>
         </section>
 
-        <footer class="flex justify-between items-center text-[10px] text-gray-600 px-2 pt-2">
+        <footer class="footer">
             <span>Forex P2P Squad © 2026</span>
-
             <span>v2.8</span>
         </footer>
 
     </div>
 
-    <script>
-        // የአድራሻ ማመንጫ ቁልፍ ሲጫን የሚሰራ ቀላል ማሳያ
-        document.getElementById('generateBtn').addEventListener('click', function() {
-            const display = document.getElementById('addressDisplay');
-            display.classList.toggle('hidden');
-            if(!display.classList.contains('hidden')){
-                this.innerText = "Address Generated! (ተፈጥሯል)";
-            } else {
-                this.innerText = "Generate Address (አድራሻ ፍጠር)";
-            }
-        });
-    </script>
 </body>
 </html>
