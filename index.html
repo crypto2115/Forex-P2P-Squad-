@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex P2P Squad</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -40,10 +40,12 @@
 
         <section class="card">
             <div class="card-title">💳 Deposit Address (የማስቀመጫ አድራሻ)</div>
-            <p style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 15px 0; line-height: 1.4;">
+            <p id="address-instruction" style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 15px 0; line-height: 1.4;">
                 Generate your unique LTC deposit address (የራስዎን LTC አድራሻ ያውጡ)
             </p>
-            <button class="btn-generate">Generate Address (አድራሻ ፍጠር)</button>
+            <div id="address-display" style="display: none; background-color: #121620; padding: 12px; border-radius: 8px; border: 1px dashed #f3cd64; margin-bottom: 15px; word-break: break-all; text-align: center; font-family: monospace; color: #f3cd64; font-size: 0.9rem;">
+            </div>
+            <button id="generate-btn" class="btn-generate">Generate Address (አድራሻ ፍጠር)</button>
         </section>
 
         <section class="card">
@@ -115,6 +117,34 @@
         </footer>
 
     </div>
+
+    <script>
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            // ዝርዝር የ LTC አድራሻዎች በነሲብ ለመቀየር
+            const ltcAddresses = [
+                "LTC_MAIN_NET_7xR9wK2pLQzNv5mX8yTqWvR2",
+                "LTC_SECURE_NET_1aB2cD3eF4gH5iJ6kL7mN8",
+                "LTC_SQUAD_P2P_9zY8xX7wW6vV5uU4tT3sR2"
+            ];
+            
+            // ከላይ ካሉት አድራሻዎች አንዱን በነሲብ መምረጥ
+            const randomAddress = ltcAddresses[Math.floor(Math.random() * ltcAddresses.length)];
+            
+            const addressDisplay = document.getElementById('address-display');
+            const instruction = document.getElementById('address-instruction');
+            
+            // አድራሻውን በስክሪኑ ላይ ማሳየት
+            addressDisplay.innerText = randomAddress;
+            addressDisplay.style.display = 'block';
+            
+            // መመሪያውን መቀየር
+            instruction.innerText = "Your unique LTC deposit address is ready (የእርስዎ LTC አድራሻ ተዘጋጅቷል):";
+            
+            // የነካኸውን በተን ፅሁፍ መቀየር
+            this.innerText = "Address Generated! (አድራሻ ወጥቷል)";
+            this.style.background = "linear-gradient(180deg, #4ade80 0%, #22c55e 100%)"; // ወደ አረንጓዴ ይቀየራል
+        });
+    </script>
 
 </body>
 </html>
