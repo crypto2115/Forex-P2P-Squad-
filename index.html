@@ -5,197 +5,186 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex P2P Squad</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #131722; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { width: 100%; max-width: 400px; background: #1c2030; padding: 30px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid #2a2e3f; }
+        /* ያንተ የድሮው ስታይል እንዳለ ሆኖ እነዚህ ተጨማሪዎች ናቸው */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #131722; color: #ffffff; padding: 15px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 420px; background: #1c2030; padding: 20px; border-radius: 12px; }
         
-        /* Logo Header */
-        .logo-section { text-align: center; margin-bottom: 25px; }
-        .logo-section .crown { font-size: 50px; }
-        .logo-section h2 { color: #f3ba2f; margin-top: 5px; font-size: 22px; }
+        /* Header section with Logo and Auth Buttons */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand-logo { width: 40px; height: 40px; background: #f3ba2f; border-radius: 8px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
+        .brand-title h2 { font-size: 18px; color: white; }
+        .brand-title p { font-size: 12px; color: #848e9c; }
+        
+        /* Auth Area Styling */
+        .auth-buttons { display: flex; flex-direction: column; gap: 5px; }
+        .btn-login { background: #f3ba2f; color: #1e2329; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-register { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        
+        /* User Profile Tag (Login ሲያደርግ የሚተካው) */
+        .user-logged-in { display: none; align-items: center; gap: 8px; background: #25293a; padding: 8px 12px; border-radius: 20px; border: 1px solid #2a2e3f; }
+        .user-name { color: #f3ba2f; font-weight: bold; font-size: 14px; }
+        .btn-logout-mini { color: #f6465d; font-size: 12px; cursor: pointer; margin-left: 5px; text-decoration: underline; }
 
-        /* Page Toggle Control */
-        .page { display: none; }
-        .page.active { display: block; }
+        /* Navigation Tabs */
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab { flex: 1; background: #25293a; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #2a2e3f; cursor: pointer; font-size: 14px; color: #b7bdc6; }
+        .tab.active { border-color: #f3ba2f; color: white; }
+
+        /* Content Blocks (የገጽህ ካርዶች) */
+        .card { background: #171a26; border: 1px solid #25293a; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .rate-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
+        .address-box { background: #232838; border: 1px solid #f3ba2f; border-style: dashed; padding: 15px; border-radius: 8px; text-align: center; margin-top: 10px; }
+        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; }
         
-        h3 { margin-bottom: 20px; text-align: center; color: #b7bdc6; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #848e9c; font-size: 14px; }
-        input, select { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 8px; color: white; font-size: 16px; outline: none; }
-        input:focus, select:focus { border-color: #f3ba2f; }
-        
-        /* Buttons */
-        button { width: 100%; padding: 14px; background: #f3ba2f; border: none; border-radius: 8px; color: #1e2329; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        button:hover { background: #e0aa2b; }
-        .btn-back { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; margin-top: 15px; }
-        .btn-back:hover { background: #363d47; color: white; }
-        
-        .switch-text { text-align: center; margin-top: 15px; font-size: 14px; color: #848e9c; }
-        .switch-text span { color: #f3ba2f; cursor: pointer; font-weight: bold; }
-        
-        /* Trading View (Buy/Sell Buttons) */
-        .trade-container { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-        .btn-trade { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 8px; font-size: 18px; font-weight: bold; text-decoration: none; color: white; border: 2px solid #f3ba2f; background: transparent; transition: 0.2s; cursor: pointer; }
-        .btn-trade.buy:hover { background: rgba(14, 203, 129, 0.1); }
-        .btn-trade.sell:hover { background: rgba(246, 70, 93, 0.1); }
-        .dot { width: 15px; height: 15px; border-radius: 50%; }
-        .dot.green { background-color: #0ecb81; box-shadow: 0 0 10px #0ecb81; }
-        .dot.red { background-color: #f6465d; box-shadow: 0 0 10px #f6465d; }
-        
-        /* Mini Profile Bar */
-        .mini-profile { background: #25293a; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; border: 1px solid #2a2e3f; }
-        .logout-link { color: #f6465d; cursor: pointer; font-weight: bold; }
+        /* Modal Popup Design for Login/Register Form */
+        .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #1c2030; padding: 25px; border-radius: 12px; width: 90%; max-width: 360px; border: 1px solid #2a2e3f; }
+        .modal-content h3 { margin-bottom: 15px; color: #f3ba2f; }
+        .modal-content input { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 6px; color: white; margin-bottom: 12px; outline: none; }
+        .modal-content button { width: 100%; padding: 12px; background: #f3ba2f; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .modal-close { text-align: center; margin-top: 10px; color: #848e9c; cursor: pointer; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="logo-section">
-        <div class="crown">👑</div>
-        <h2>Forex P2P Squad</h2>
+<div class="app-container">
+    
+    <div class="header-top">
+        <div class="brand">
+            <div class="brand-logo">👑</div>
+            <div class="brand-title">
+                <h2>Forex P2P</h2>
+                <p>Squad</p>
+            </div>
+        </div>
+        
+        <div id="auth-guest-view" class="auth-buttons">
+            <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
+            <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
+        </div>
+
+        <div id="auth-user-view" class="user-logged-in">
+            <span>👤 <span id="display-username" class="user-name">---</span></span>
+            <span class="btn-logout-mini" onclick="handleLogout()">ውጣ</span>
+        </div>
     </div>
 
-    <div id="register-page" class="page active">
-        <h3>አዲስ አካውንት መክፈቻ</h3>
-        <div class="input-group">
-            <label>ሙሉ ስም</label>
-            <input type="text" id="reg-name" placeholder="የእርስዎን ስም ያስገቡ">
-        </div>
-        <div class="input-group">
-            <label>ስልክ ቁጥር</label>
-            <input type="tel" id="reg-phone" placeholder="09xxxxxxxx">
-        </div>
-        <div class="input-group">
-            <label>የይለፍ ቃል (Password)</label>
-            <input type="password" id="reg-pass" placeholder="ጠንካራ ፓስወርድ ያስገቡ">
-        </div>
-        <button onclick="handleRegister()">አካውንት ክፈት (Register)</button>
-        <p class="switch-text">አካውንት አለዎት? <span onclick="switchPage('login-page')">Login ይግቡ</span></p>
+    <div class="nav-tabs">
+        <div class="tab active">🏠 Home</div>
+        <div class="tab" onclick="alert('P2P Trade ገጽ በቅርቡ...')">🔄 P2P Trade</div>
+        <div class="tab">📖 Guide</div>
     </div>
 
-    <div id="login-page" class="page">
+    <div class="card">
+        <p style="color: #848e9c; font-size: 14px;">📈 Withdrawal Rate (BEP20 USDT)</p>
+        <div class="rate-row">
+            <span>Under 10 USDT</span>
+            <strong style="color: #f3ba2f;">170 ETB</strong>
+        </div>
+        <div class="rate-row">
+            <span>10+ USDT</span>
+            <strong style="color: #f3ba2f;">175 ETB</strong>
+        </div>
+    </div>
+
+    <div class="card">
+        <p style="color: #848e9c; font-size: 14px;">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</p>
+        <p style="font-size: 13px; margin-top: 5px; color: #b7bdc6;">Your unique BEP20 deposit address is ready:</p>
+        
+        <div class="address-box">
+            <code style="color: #f3ba2f; font-size: 14px;">0x71C...I5a6C</code>
+            <p style="font-size: 12px; color: #848e9c; margin-top: 5px; cursor: pointer;">📋 Copy BEP20 Address</p>
+        </div>
+        
+        <button class="btn-green">Address Generated!</button>
+    </div>
+
+</div>
+
+<div id="login-modal" class="auth-modal">
+    <div class="modal-content">
         <h3>መግቢያ ገጽ (Login)</h3>
-        <div class="input-group">
-            <label>ስልክ ቁጥር</label>
-            <input type="tel" id="login-phone" placeholder="የተመዘገቡበት ስልክ">
-        </div>
-        <div class="input-group">
-            <label>የይለፍ ቃል (Password)</label>
-            <input type="password" id="login-pass" placeholder="ፓስወርድዎን ያስገቡ">
-        </div>
-        <button onclick="handleLogin()">ግባ (Login)</button>
-        <p class="switch-text">አዲስ ነዎት? <span onclick="switchPage('register-page')">አካውንት ክፈት</span></p>
-    </div>
-
-    <div id="trading-page" class="page">
-        <div class="mini-profile">
-            <span>👤 ሰላም፣ <strong id="user-bar-name" style="color: #f3ba2f;">---</strong></span>
-            <span class="logout-link" onclick="handleLogout()">ውጣ (Logout)</span>
-        </div>
-        
-        <h3>Welcome! Tap below to start trading.</h3>
-        <p style="text-align: center; color: #848e9c; font-size: 14px; margin-top: -10px; margin-bottom: 20px;">on Telegram Mini App.</p>
-        
-        <div class="trade-container">
-            <button class="btn-trade buy" onclick="switchPage('buy-page')">
-                <div class="dot green"></div> Buy USDT
-            </button>
-            <button class="btn-trade sell" onclick="switchPage('sell-page')">
-                <div class="dot red"></div> Sell USDT
-            </button>
-        </div>
-    </div>
-
-    <div id="buy-page" class="page">
-        <h3 style="color: #0ecb81;">🟢 Buy USDT</h3>
-        <div class="input-group">
-            <label>የሚገዙት የዶላር መጠን ($)</label>
-            <input type="number" placeholder="ለምሳሌ፦ 50">
-        </div>
-        <div class="input-group">
-            <label>የመክፈያ ዘዴ (Payment Method)</label>
-            <select>
-                <option>CBE (የኢትዮጵያ ንግድ ባንክ)</option>
-                <option>Telebirr (ቴሌብር)</option>
-                <option>BOA (አቢሲኒያ ባንክ)</option>
-            </select>
-        </div>
-        <button style="background: #0ecb81; color: white;" onclick="alert('የመግዣ ትዕዛዝዎ ተልኳል!')">የመግዣ ጥያቄ ላክ (Submit Buy)</button>
-        <button class="btn-back" onclick="switchPage('trading-page')">⬅️ ተመለስ</button>
-    </div>
-
-    <div id="sell-page" class="page">
-        <h3 style="color: #f6465d;">🔴 Sell USDT</h3>
-        <div class="input-group">
-            <label>የሚሸጡት የዶላር መጠን ($)</label>
-            <input type="number" placeholder="ለምሳሌ፦ 100">
-        </div>
-        <div class="input-group">
-            <label>ገንዘብ የሚቀበሉበት ባንክ</label>
-            <select>
-                <option>CBE (የኢትዮጵያ ንግድ ባንክ)</option>
-                <option>Telebirr (ቴሌብር)</option>
-                <option>BOA (አቢሲኒያ ባንክ)</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <label>የባንክ አካውንት ቁጥር</label>
-            <input type="text" placeholder="የአካውንት ቁጥር ወይም ስልክ ያስገቡ">
-        </div>
-        <button style="background: #f6465d; color: white;" onclick="alert('የመሸጫ ትዕዛዝዎ ተልኳል!')">የመሸጫ ጥያቄ ላክ (Submit Sell)</button>
-        <button class="btn-back" onclick="switchPage('trading-page')">⬅️ ተመለስ</button>
+        <input type="tel" id="login-phone" placeholder="ስልክ ቁጥር">
+        <input type="password" id="login-pass" placeholder="የይለፍ ቃል">
+        <button onclick="processLogin()">ግባ</button>
+        <div class="modal-close" onclick="closeModal('login-modal')">❌ ዝጋ</div>
     </div>
 </div>
 
-<script>
-    function switchPage(pageId) {
-        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) { targetPage.classList.add('active'); }
-    }
+<div id="register-modal" class="auth-modal">
+    <div class="modal-content">
+        <h3>አዲስ ምዝገባ</h3>
+        <input type="text" id="reg-name" placeholder="ሙሉ ስም">
+        <input type="tel" id="reg-phone" placeholder="ስልክ ቁጥር">
+        <input type="password" id="reg-pass" placeholder="ፓስወርድ">
+        <button onclick="processRegister()">ተመዝገብ</button>
+        <div class="modal-close" onclick="closeModal('register-modal')">❌ ዝጋ</div>
+    </div>
+</div>
 
+
+<script>
+    // ሞዳሎችን ለመክፈት እና ለመዝጋት
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // አፑ ገና ሲከፈት በጀርባ ቼክ ማድረጊያ (Remember Me ሎጂክ)
     window.onload = function() {
-        const loggedInUser = localStorage.getItem('currentUser');
-        if (loggedInUser) { autoLogin(JSON.parse(loggedInUser)); }
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            // ተጠቃሚው ድሮ ገብቶ ከነበረ ስሙን በቀጥታ ከላይ ይተካዋል!
+            updateHeaderForUser(JSON.parse(savedUser).name);
+        }
     };
 
-    function handleRegister() {
+    // የምዝገባ ሒደት
+    function processRegister() {
         const name = document.getElementById('reg-name').value.trim();
         const phone = document.getElementById('reg-phone').value.trim();
         const pass = document.getElementById('reg-pass').value.trim();
-        if (!name || !phone || !pass) { alert('❌ እባክዎ ሁሉንም ይሙሉ!'); return; }
+
+        if (!name || !phone || !pass) { alert('እባክዎ ሁሉንም ይሙሉ!'); return; }
 
         const userData = { name: name, phone: phone, password: pass };
         localStorage.setItem('user_' + phone, JSON.stringify(userData));
-        localStorage.setItem('currentUser', JSON.stringify(userData)); 
-        autoLogin(userData);
+        localStorage.setItem('currentUser', JSON.stringify(userData)); // ለትውስታ
+
+        closeModal('register-modal');
+        updateHeaderForUser(name);
+        alert('🎉 ምዝገባው ተሳክቷል!');
     }
 
-    function handleLogin() {
+    // የመግቢያ ሒደት
+    function processLogin() {
         const phone = document.getElementById('login-phone').value.trim();
         const pass = document.getElementById('login-pass').value.trim();
-        if (!phone || !pass) { alert('❌ ስልክ እና ፓስወርድ ያስገቡ!'); return; }
 
-        const savedUser = localStorage.getItem('user_' + phone);
-        if (savedUser) {
-            const userData = JSON.parse(savedUser);
-            if (userData.password === pass) {
-                localStorage.setItem('currentUser', JSON.stringify(userData)); 
-                autoLogin(userData);
-            } else { alert('❌ ፓስወርድ ተሳስተሃል!'); }
-        } else { alert('❌ አልተመዘገብክም!'); }
+        const savedData = localStorage.getItem('user_' + phone);
+        if (savedData) {
+            const user = JSON.parse(savedData);
+            if (user.password === pass) {
+                localStorage.setItem('currentUser', JSON.stringify(user)); // ለትውስታ
+                closeModal('login-modal');
+                updateHeaderForUser(user.name);
+                alert('👋 እንኳን ደህና መጡ!');
+            } else { alert('❌ የይለፍ ቃል ተሳስቷል!'); }
+        } else { alert('❌ ይህ ስልክ አልተመዘገበም!'); }
     }
 
-    function autoLogin(user) {
-        if(document.getElementById('user-bar-name')) {
-            document.getElementById('user-bar-name').innerText = user.name;
-        }
-        switchPage('trading-page'); 
+    // ከላይ ያለውን በተን በስም የመተኪያ ዋናው ፈንክሽን
+    function updateHeaderForUser(username) {
+        document.getElementById('auth-guest-view').style.display = 'none'; // በተኖቹን ደብቅ
+        document.getElementById('auth-user-view').style.display = 'flex';   // ስሙን አሳይ
+        document.getElementById('display-username').innerText = username;   // ስሙን መጻፍ
     }
 
+    // ከሲስተሙ መውጫ (Logout)
     function handleLogout() {
-        localStorage.removeItem('currentUser'); 
-        switchPage('login-page');
+        localStorage.removeItem('currentUser'); // ትውስታውን አጥፋ
+        document.getElementById('auth-user-view').style.display = 'none';  // ስሙን ደብቅ
+        document.getElementById('auth-guest-view').style.display = 'flex'; // በተኖቹን መልስ
     }
 </script>
 
