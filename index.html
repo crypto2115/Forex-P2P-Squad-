@@ -1,192 +1,166 @@
-<!DOCTYPE html>
-<html lang="am">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex P2P Squad</title>
-    <style>
-        /* ያንተ የድሮው ስታይል እንዳለ ሆኖ እነዚህ ተጨማሪዎች ናቸው */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #131722; color: #ffffff; padding: 15px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 420px; background: #1c2030; padding: 20px; border-radius: 12px; }
-        
-        /* Header section with Logo and Auth Buttons */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .brand-logo { width: 40px; height: 40px; background: #f3ba2f; border-radius: 8px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
-        .brand-title h2 { font-size: 18px; color: white; }
-        .brand-title p { font-size: 12px; color: #848e9c; }
-        
-        /* Auth Area Styling */
-        .auth-buttons { display: flex; flex-direction: column; gap: 5px; }
-        .btn-login { background: #f3ba2f; color: #1e2329; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-register { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        
-        /* User Profile Tag (Login ሲያደርግ የሚተካው) */
-        .user-logged-in { display: none; align-items: center; gap: 8px; background: #25293a; padding: 8px 12px; border-radius: 20px; border: 1px solid #2a2e3f; }
-        .user-name { color: #f3ba2f; font-weight: bold; font-size: 14px; }
-        .btn-logout-mini { color: #f6465d; font-size: 12px; cursor: pointer; margin-left: 5px; text-decoration: underline; }
+import telebot
+from telebot import types
+import os
 
-        /* Navigation Tabs */
-        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-        .tab { flex: 1; background: #25293a; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #2a2e3f; cursor: pointer; font-size: 14px; color: #b7bdc6; }
-        .tab.active { border-color: #f3ba2f; color: white; }
+# 1. መረጃዎችን ከ Railway Variables መሳብ
+TOKEN = os.getenv('BOT_TOKEN')
+ADMIN_ID = os.getenv('ADMIN_ID')  # የአንተ የቴሌግራም ID (በቁጥር)
+CHANNEL_USERNAME = os.getenv('CHANNEL_USERNAME')
 
-        /* Content Blocks (የገጽህ ካርዶች) */
-        .card { background: #171a26; border: 1px solid #25293a; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .rate-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
-        .address-box { background: #232838; border: 1px solid #f3ba2f; border-style: dashed; padding: 15px; border-radius: 8px; text-align: center; margin-top: 10px; }
-        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; }
-        
-        /* Modal Popup Design for Login/Register Form */
-        .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #1c2030; padding: 25px; border-radius: 12px; width: 90%; max-width: 360px; border: 1px solid #2a2e3f; }
-        .modal-content h3 { margin-bottom: 15px; color: #f3ba2f; }
-        .modal-content input { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 6px; color: white; margin-bottom: 12px; outline: none; }
-        .modal-content button { width: 100%; padding: 12px; background: #f3ba2f; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .modal-close { text-align: center; margin-top: 10px; color: #848e9c; cursor: pointer; font-size: 14px; }
-    </style>
-</head>
-<body>
+bot = telebot.TeleBot(TOKEN)
 
-<div class="app-container">
+# የመግዣ እና የመሸጫ ዋጋዎች ለየብቻ (በመጀመሪያ መነሻ እዚህ ይቀመጣሉ)
+BUY_RATE = 185.0   # ደንበኛ ከአንተ የሚገዛበት ዋጋ
+SELL_RATE = 175.0  # ደንበኛ ለአንተ የሚሸጥበት ዋጋ
+
+# የተጠቃሚዎችን የግብይት ሂደት ለመያዝ
+user_sessions = {}
+
+# 🔗 🎯 የ Vercel Mini App ሊንክህን እዚህ ጋር አስገባ!
+# (ማሳሰቢያ፦ ሊንኩ ግዴታ በ https:// መጀመር አለበት)
+MINI_APP_URL = "https://ያንተ-ሚኒ-አፕ-ሊንክ.vercel.app" 
+
+def is_subscribed(user_id):
+    try:
+        status = bot.get_chat_member(CHANNEL_USERNAME, user_id).status
+        return status in ['member', 'administrator', 'creator']
+    except:
+        return False
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    if not is_subscribed(message.from_user.id):
+        markup = types.InlineKeyboardMarkup()
+        btn_join = types.InlineKeyboardButton("🔥 JOIN CHANNEL 🔥", url=f"https://t.me/{CHANNEL_USERNAME[1:]}")
+        btn_check = types.InlineKeyboardButton("🔄 አረጋግጥ", callback_data="check_sub")
+        markup.add(btn_join)
+        markup.add(btn_check)
+        bot.send_message(message.chat.id, f"እንኳን መጡ! ቦቱን ለመጠቀም መጀመሪያ ቻናላችንን ይቀላቀሉ፦ {CHANNEL_USERNAME}", reply_markup=markup)
+        return
     
-    <div class="header-top">
-        <div class="brand">
-            <div class="brand-logo">👑</div>
-            <div class="brand-title">
-                <h2>Forex P2P</h2>
-                <p>Squad</p>
-            </div>
-        </div>
+    send_main_menu(message.chat.id)
+
+# ለአድሚን ብቻ የመግዣ ዋጋ መለወጫ (/setbuy 122.5)
+@bot.message_handler(commands=['setbuy'])
+def set_buy_rate(message):
+    global BUY_RATE
+    if str(message.from_user.id) == str(ADMIN_ID):
+        try:
+            new_rate = float(message.text.split()[1])
+            BUY_RATE = new_rate
+            bot.reply_to(message, f"✅ የUSDT መግዣ ዋጋ ተቀይሯል!\n🟢 የአሁኑ መግዣ ዋጋ፦ `{BUY_RATE} ETB`", parse_mode="Markdown")
+        except:
+            bot.reply_to(message, "❌ እባክዎ በትክክል ያስገቡ。ምሳሌ፦ `/setbuy 122.5`", parse_mode="Markdown")
+    else:
+        bot.reply_to(message, "❌ ይህንን ለማድረግ ፈቃድ የለዎትም።")
+
+# ለአድሚን ብቻ የመሸጫ ዋጋ መለወጫ (/setsell 120.0)
+@bot.message_handler(commands=['setsell'])
+def set_sell_rate(message):
+    global SELL_RATE
+    if str(message.from_user.id) == str(ADMIN_ID):
+        try:
+            new_rate = float(message.text.split()[1])
+            SELL_RATE = new_rate
+            bot.reply_to(message, f"✅ የUSDT መሸጫ ዋጋ ተቀይሯል!\n🔴 የአሁኑ መሸጫ ዋጋ፦ `{SELL_RATE} ETB`", parse_mode="Markdown")
+        except:
+            bot.reply_to(message, "❌ እባክዎ በትክክል ያስገቡ。ምሳሌ፦ `/setsell 120.0`", parse_mode="Markdown")
+    else:
+        bot.reply_to(message, "❌ ይህንን ለማድረግ ፈቃድ የለዎትም።")
+
+def send_main_menu(chat_id):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    
+    # 🚀 🔥 ቱሩፋቱ እዚህ ጋር ነው! የድሮው በተን አሁን ቀጥታ Mini Appህን እንዲከፍት ተደርጓል
+    # WebAppInfoን በመጠቀም ተጠቃሚው በተኑን ሲነካ በቴሌግራም ውስጥ ድንቅ ገጽ ይከፈትለታል
+    btn1 = types.KeyboardButton("💸 USDT መግዛት/መሸጥ (P2P)", web_app=types.WebAppInfo(url=MINI_APP_URL))
+    
+    btn2 = types.KeyboardButton("📣 ማስታወቂያ ለማሰራት")
+    btn3 = types.KeyboardButton("🔱 Tutorial & Info")
+    btn4 = types.KeyboardButton("🌟 Donate (Stars/TON)")
+    btn5 = types.KeyboardButton("🙋‍♂️ ጥያቄና ሀሳብ")
+
+    markup.add(btn1)
+    markup.add(btn2, btn3)
+    markup.add(btn4, btn5)
+
+    welcome_text = "እንኳን ወደ **Forex p2p squad** በደህና መጡ! 🚀\n\nከታች ያለውን **የ P2P በተን** በመጫን አዲሱን ሚኒ አፓችንን ተጠቅመው መገበያየት ይችላሉ።"
+    bot.send_message(chat_id, welcome_text, reply_markup=markup, parse_mode="Markdown")
+
+@bot.message_handler(func=lambda message: True)
+def handle_messages(message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+    text = message.text
+
+    # የ ታይቶሪያል በተን
+    if "Tutorial" in text or "Info" in text or "🔱" in text:
+        tutorial_text = (
+            "🔱 **ስለ Forex P2P Squad ቦት** 🔱\n\n"
+            "ይህ ቦት የተመሰረተው የክሪፕቶ ግብይትን (P2P) ለኢትዮጵያውያን ለማቅለል እና ለማገዝ ነው።\n\n"
+            "📖 **መመሪያዎች፦**\n"
+            "1️⃣ **P2P ግብይት:** ዋናው ማውጫ ላይ ያለውን የመጀመሪያ በተን ሲጫኑ የራሳችን Mini App ይከፈታል። እዚያ ላይ መመዝገብ፣ መግባት (Login) እና መገበያየት ይችላሉ።\n"
+            "2️⃣ **Ads (ማስታወቂያ):** የእርስዎን ምርት ወይም አገልግሎት በቻናላችን ላይ ማስተዋወቅ ሲፈልጉ የሚጠቀሙበት ነው።\n"
+            "3️⃣ **ደህንነት:** ማንኛውም ግብይት በአድሚኑ @Crypto2115 አማካኝነት በታማኝነት የሚፈጸም ይሆናል።\n\n"
+            "ቦቱን ስለተጠቀሙ እናመሰግናለን!"
+        )
+        bot.send_message(chat_id, tutorial_text, parse_mode="Markdown")
+
+    # የማስታወቂያ በተን
+    elif "ማስታወቂያ" in text:
+        msg = bot.send_message(chat_id, "📣 የማስታወቂያውን ዝርዝር ጽፈው ይላኩ። አድሚን አይቶ ያነጋግርዎታል።")
+        bot.register_next_step_handler(msg, process_ads)
+
+    # የዶኔሽን በተን
+    elif "Donate" in text or "Stars" in text or "TON" in text or "🌟" in text:
+        donate_text = (
+            "🌟 **ቦቱን ይደግፉ** 🌟\n\n"
+            "የቦቱን አገልግሎት ይበልጥ ለማሳደግ በቴሌግራም ስታርስ (Stars) ወይም በቶን (TON) ልገሳ ማድረግ ይችላሉ።\n\n"
+            "💎 **TON Wallet Address:**\n`UQDJz-8jU5JjyXJZYFj_XrSHuWeZdrQS0tahU2Ie5WWacpYp`\n\n"
+            "⭐ **Telegram Stars:**\nበቀጥታ አድሚኑን @Crypto2115 በማነጋገር በስጦታ መልክ መላክ ይችላሉ።\n\n"
+            "ለሚያደርጉት ድጋፍ ከልብ እናመሰግናለን! 🙏"
+        )
+        bot.send_message(chat_id, donate_text, parse_mode="Markdown")
+
+    # ጥያቄና ሀሳብ በተን
+    elif "ጥያቄ" in text or "ሀሳብ" in text:
+        msg = bot.send_message(chat_id, "🙋‍♂️ እባክዎ የእርስዎን ጥያቄ ወይም አስተያየት ጽፈው ይላኩ። አድሚኑ ጋር በቀጥታ ይደርሳል።")
+        bot.register_next_step_handler(msg, process_feedback)
+
+    # ወደ ዋናው ማውጫ መመለሻ
+    elif "ዋናው ማውጫ" in text or "🔙" in text:
+        send_main_menu(chat_id)
+
+def process_ads(message):
+    if "ዋናው ማውጫ" in message.text or "🔙" in message.text:
+        send_main_menu(message.chat.id)
+        return
         
-        <div id="auth-guest-view" class="auth-buttons">
-            <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
-            <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
-        </div>
+    bot.send_message(ADMIN_ID, f"📣 **የማስታወቂያ ጥያቄ፦**\n\nከ @{message.from_user.username}\nመልእክት፦ {message.text}")
+    bot.send_message(message.chat.id, "✅ የማስታወቂያ ጥያቄዎ ደርሷል። አድሚን ያነጋግርዎታል።")
 
-        <div id="auth-user-view" class="user-logged-in">
-            <span>👤 <span id="display-username" class="user-name">---</span></span>
-            <span class="btn-logout-mini" onclick="handleLogout()">ውጣ</span>
-        </div>
-    </div>
-
-    <div class="nav-tabs">
-        <div class="tab active">🏠 Home</div>
-        <div class="tab" onclick="alert('P2P Trade ገጽ በቅርቡ...')">🔄 P2P Trade</div>
-        <div class="tab">📖 Guide</div>
-    </div>
-
-    <div class="card">
-        <p style="color: #848e9c; font-size: 14px;">📈 Withdrawal Rate (BEP20 USDT)</p>
-        <div class="rate-row">
-            <span>Under 10 USDT</span>
-            <strong style="color: #f3ba2f;">170 ETB</strong>
-        </div>
-        <div class="rate-row">
-            <span>10+ USDT</span>
-            <strong style="color: #f3ba2f;">175 ETB</strong>
-        </div>
-    </div>
-
-    <div class="card">
-        <p style="color: #848e9c; font-size: 14px;">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</p>
-        <p style="font-size: 13px; margin-top: 5px; color: #b7bdc6;">Your unique BEP20 deposit address is ready:</p>
+def process_feedback(message):
+    if "ዋናው ማውጫ" in message.text or "🔙" in message.text:
+        send_main_menu(message.chat.id)
+        return
         
-        <div class="address-box">
-            <code style="color: #f3ba2f; font-size: 14px;">0x71C...I5a6C</code>
-            <p style="font-size: 12px; color: #848e9c; margin-top: 5px; cursor: pointer;">📋 Copy BEP20 Address</p>
-        </div>
-        
-        <button class="btn-green">Address Generated!</button>
-    </div>
+    admin_msg = (
+        f"🙋‍♂️ **አዲስ አስተያየት/ጥያቄ ደርሶዎታል!**\n\n"
+        f"👤 ከ፦ @{message.from_user.username if message.from_user.username else 'የለውም'}\n"
+        f"🆔 ID: `{message.from_user.id}`\n"
+        f"📝 መልእክት፦ {message.text}"
+    )
+    bot.send_message(ADMIN_ID, admin_msg, parse_mode="Markdown")
+    bot.send_message(message.chat.id, "✅ አስተያየትዎ ወይም ጥያቄዎ በተሳካ ሁኔታ ለአድሚኑ ደርሷል። እናመሰግናለን!")
 
-</div>
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    if call.data == "check_sub":
+        if is_subscribed(call.from_user.id):
+            bot.answer_callback_query(call.id, "ተሳክቷል!")
+            send_main_menu(call.message.chat.id)
+        else:
+            bot.answer_callback_query(call.id, "አሁንም ቻናሉን አልተቀላቀሉም!", show_alert=True)
 
-<div id="login-modal" class="auth-modal">
-    <div class="modal-content">
-        <h3>መግቢያ ገጽ (Login)</h3>
-        <input type="tel" id="login-phone" placeholder="ስልክ ቁጥር">
-        <input type="password" id="login-pass" placeholder="የይለፍ ቃል">
-        <button onclick="processLogin()">ግባ</button>
-        <div class="modal-close" onclick="closeModal('login-modal')">❌ ዝጋ</div>
-    </div>
-</div>
-
-<div id="register-modal" class="auth-modal">
-    <div class="modal-content">
-        <h3>አዲስ ምዝገባ</h3>
-        <input type="text" id="reg-name" placeholder="ሙሉ ስም">
-        <input type="tel" id="reg-phone" placeholder="ስልክ ቁጥር">
-        <input type="password" id="reg-pass" placeholder="ፓስወርድ">
-        <button onclick="processRegister()">ተመዝገብ</button>
-        <div class="modal-close" onclick="closeModal('register-modal')">❌ ዝጋ</div>
-    </div>
-</div>
-
-
-<script>
-    // ሞዳሎችን ለመክፈት እና ለመዝጋት
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    // አፑ ገና ሲከፈት በጀርባ ቼክ ማድረጊያ (Remember Me ሎጂክ)
-    window.onload = function() {
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            // ተጠቃሚው ድሮ ገብቶ ከነበረ ስሙን በቀጥታ ከላይ ይተካዋል!
-            updateHeaderForUser(JSON.parse(savedUser).name);
-        }
-    };
-
-    // የምዝገባ ሒደት
-    function processRegister() {
-        const name = document.getElementById('reg-name').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const pass = document.getElementById('reg-pass').value.trim();
-
-        if (!name || !phone || !pass) { alert('እባክዎ ሁሉንም ይሙሉ!'); return; }
-
-        const userData = { name: name, phone: phone, password: pass };
-        localStorage.setItem('user_' + phone, JSON.stringify(userData));
-        localStorage.setItem('currentUser', JSON.stringify(userData)); // ለትውስታ
-
-        closeModal('register-modal');
-        updateHeaderForUser(name);
-        alert('🎉 ምዝገባው ተሳክቷል!');
-    }
-
-    // የመግቢያ ሒደት
-    function processLogin() {
-        const phone = document.getElementById('login-phone').value.trim();
-        const pass = document.getElementById('login-pass').value.trim();
-
-        const savedData = localStorage.getItem('user_' + phone);
-        if (savedData) {
-            const user = JSON.parse(savedData);
-            if (user.password === pass) {
-                localStorage.setItem('currentUser', JSON.stringify(user)); // ለትውስታ
-                closeModal('login-modal');
-                updateHeaderForUser(user.name);
-                alert('👋 እንኳን ደህና መጡ!');
-            } else { alert('❌ የይለፍ ቃል ተሳስቷል!'); }
-        } else { alert('❌ ይህ ስልክ አልተመዘገበም!'); }
-    }
-
-    // ከላይ ያለውን በተን በስም የመተኪያ ዋናው ፈንክሽን
-    function updateHeaderForUser(username) {
-        document.getElementById('auth-guest-view').style.display = 'none'; // በተኖቹን ደብቅ
-        document.getElementById('auth-user-view').style.display = 'flex';   // ስሙን አሳይ
-        document.getElementById('display-username').innerText = username;   // ስሙን መጻፍ
-    }
-
-    // ከሲስተሙ መውጫ (Logout)
-    function handleLogout() {
-        localStorage.removeItem('currentUser'); // ትውስታውን አጥፋ
-        document.getElementById('auth-user-view').style.display = 'none';  // ስሙን ደብቅ
-        document.getElementById('auth-guest-view').style.display = 'flex'; // በተኖቹን መልስ
-    }
-</script>
-
-</body>
-</html>
+if __name__ == "__main__":
+    bot.infinity_polling()
