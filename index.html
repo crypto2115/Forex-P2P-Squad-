@@ -3,82 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex P2P Squad</title>
+    <title>Forex p2p squad</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #131722; color: #ffffff; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 420px; background: #1c2030; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        body { background-color: #131722; color: #ffffff; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
         
-        /* 🔝 TOP HEADER AREA */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .brand-logo { width: 40px; height: 40px; background: #f3ba2f; border-radius: 8px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
-        .brand-title h2 { font-size: 18px; color: white; }
-        .brand-title p { font-size: 12px; color: #848e9c; }
+        /* 📱 ሙሉ ኮንቴይነሩ Size እንዲጨምር ተደርጓል */
+        .app-container { width: 100%; max-width: 440px; background: #161a25; padding: 25px; border-radius: 20px; box-shadow: 0 6px 25px rgba(0,0,0,0.5); }
+        
+        /* 🔝 TOP HEADER AREA (ትልቅ የተደረገ) */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand-logo { width: 52px; height: 52px; background: #f3ba2f; border-radius: 12px; font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(243,186,47,0.25); }
+        .brand-title h2 { font-size: 22px; color: white; font-weight: bold; line-height: 1.1; }
+        .brand-title p { font-size: 15px; color: #848e9c; }
         
         /* Auth Buttons Box */
-        .auth-buttons { display: flex; flex-direction: column; gap: 5px; }
-        .btn-login { background: #f3ba2f; color: #1e2329; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-register { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .auth-buttons { display: flex; flex-direction: column; gap: 8px; }
+        .btn-login { background: #f3ba2f; color: #1e2329; border: none; padding: 10px 22px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-register { background: #202434; color: #b7bdc6; border: 1px solid #2d3346; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 15px; }
         
-        /* User Profile Tag */
-        .user-logged-in { display: none; align-items: center; gap: 8px; background: #25293a; padding: 8px 12px; border-radius: 20px; border: 1px solid #2a2e3f; cursor: pointer; }
-        .user-name { color: #f3ba2f; font-weight: bold; font-size: 14px; }
+        /* 👤 USER TAG (ትልቅ እና ጎላ ያለ) */
+        .user-logged-in { display: none; align-items: center; gap: 8px; background: #202434; padding: 10px 18px; border-radius: 25px; border: 1px solid #2d3346; cursor: pointer; font-size: 16px; }
+        .user-name { color: #f3ba2f; font-weight: bold; font-style: italic; }
+        .eye-icon { color: #3b82f6; margin-left: 4px; font-size: 15px; }
 
-        /* 🗂️ NAVIGATION TABS */
-        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-        .tab { flex: 1; background: #25293a; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #2a2e3f; cursor: pointer; font-size: 14px; color: #b7bdc6; }
-        .tab.active { border-color: #f3ba2f; color: white; background: #1e2232; }
+        /* 🗂️ NAVIGATION TABS (ትልልቅ በተኖች) */
+        .nav-tabs { display: flex; gap: 12px; margin-bottom: 28px; }
+        .tab { flex: 1; background: #1e2232; padding: 16px 12px; border-radius: 12px; text-align: center; border: 1px solid #252a3e; cursor: pointer; font-size: 16px; color: #b7bdc6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-weight: bold; }
+        .tab.active { border-color: #f3ba2f; color: #f3ba2f; background: #161a25; }
 
         /* Page Views Control */
         .page-view { display: none; }
         .page-view.active { display: block; }
 
         /* Content Cards */
-        .card { background: #171a26; border: 1px solid #25293a; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .rate-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
-        .address-box { background: #232838; border: 1px solid #f3ba2f; border-style: dashed; padding: 15px; border-radius: 8px; text-align: center; margin-top: 10px; }
-        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .btn-yellow { width: 100%; background: linear-gradient(180deg, #f3ba2f 0%, #dca41b 100%); color: #1e2329; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .card { background: #1c2030; border: 1px solid #252a3e; border-radius: 18px; padding: 22px; margin-bottom: 22px; }
+        .card-title { color: #848e9c; font-size: 16px; font-weight: 500; margin-bottom: 5px; }
+        .rate-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 18px; }
+        .address-box { background: #161a25; border: 1px solid #f3ba2f; border-style: dashed; padding: 18px; border-radius: 12px; text-align: center; margin-top: 15px; word-break: break-all; }
+        
+        /* 🔥 የቅጽበታዊ በተኖች መጠን ጨምሯል */
+        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 18px; cursor: pointer; }
+        .btn-yellow { width: 100%; background: linear-gradient(180deg, #f3ba2f 0%, #dca41b 100%); color: #1e2329; border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 18px; cursor: pointer; box-shadow: 0 5px 15px rgba(243,186,47,0.3); }
         
         /* Top Withdrawals List */
-        .withdrawal-item { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 14px; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .rank-num { width: 24px; height: 24px; border: 1px solid #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #f3ba2f; }
+        .withdrawal-item { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; font-size: 16px; }
+        .user-info { display: flex; align-items: center; gap: 14px; }
+        .rank-num { width: 30px; height: 30px; border: 1px solid #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #f3ba2f; font-weight: bold; }
 
-        /* P2P Trade Buttons */
-        .trade-container { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
-        .btn-trade { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 8px; font-size: 18px; font-weight: bold; color: white; border: 2px solid #343a40; background: #171a26; transition: 0.2s; cursor: pointer; }
+        /* P2P Trade Buttons (ትልልቅ የ Buy/Sell ቁልፎች) */
+        .trade-container { display: flex; flex-direction: column; gap: 18px; margin-top: 15px; }
+        .btn-trade { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 20px; border-radius: 12px; font-size: 21px; font-weight: bold; color: white; border: 2px solid #2d3346; background: #1c2030; transition: 0.2s; cursor: pointer; }
         .btn-trade.buy { border-color: #0ecb81; }
         .btn-trade.sell { border-color: #f6465d; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .dot.green { background-color: #0ecb81; box-shadow: 0 0 8px #0ecb81; }
-        .dot.red { background-color: #f6465d; box-shadow: 0 0 8px #f6465d; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; }
+        .dot.green { background-color: #0ecb81; box-shadow: 0 0 10px #0ecb81; }
+        .dot.red { background-color: #f6465d; box-shadow: 0 0 10px #f6465d; }
 
         /* Profile Details Screen */
-        .profile-card { text-align: center; padding: 20px 10px; }
-        .crown-icon { font-size: 50px; margin-bottom: 5px; }
-        .main-title { color: #f3ba2f; font-size: 22px; margin-bottom: 15px; font-weight: bold; }
-        .sub-title { color: #b7bdc6; font-size: 16px; margin-bottom: 20px; }
-        .avatar-box { background: #25293a; width: 100px; height: 100px; border-radius: 12px; margin: 0 auto 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #2a2e3f; }
-        .info-list { text-align: left; background: #171a26; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #25293a; }
-        .info-item { margin-bottom: 12px; font-size: 15px; color: #b7bdc6; display: flex; align-items: center; gap: 8px; }
-        .btn-logout { width: 100%; padding: 14px; background: #2b3139; color: #f6465d; border: 1px solid #474d57; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .profile-card { text-align: center; padding: 25px 12px; }
+        .crown-icon { font-size: 65px; margin-bottom: 8px; }
+        .main-title { color: #f3ba2f; font-size: 28px; margin-bottom: 15px; font-weight: bold; }
+        .sub-title { color: #b7bdc6; font-size: 19px; margin-bottom: 28px; }
+        .avatar-box { background: #202434; width: 120px; height: 120px; border-radius: 20px; margin: 0 auto 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #2d3346; }
+        .avatar-box .u-name { font-size: 18px; color: #f3ba2f; font-weight: bold; margin-top: 8px; }
+        .info-list { text-align: left; background: #161a25; padding: 22px; border-radius: 16px; margin-bottom: 28px; border: 1px solid #252a3e; }
+        .info-item { margin-bottom: 18px; font-size: 17px; color: #b7bdc6; display: flex; align-items: center; gap: 12px; }
+        .btn-logout { width: 100%; padding: 16px; background: #202434; color: #f6465d; border: 1px solid #474d57; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
 
         /* Form Controls */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; color: #848e9c; font-size: 14px; }
-        .input-group input, .input-group select { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 8px; color: white; font-size: 16px; outline: none; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: #848e9c; font-size: 16px; }
+        .input-group input, .input-group select { width: 100%; padding: 15px; background: #202434; border: 1px solid #474d57; border-radius: 12px; color: white; font-size: 18px; outline: none; }
         .input-group input:focus { border-color: #f3ba2f; }
-        .btn-back { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; margin-top: 15px; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-back { background: #202434; color: #b7bdc6; border: 1px solid #474d57; margin-top: 18px; width: 100%; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
 
         /* Modals Design */
-        .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #1c2030; padding: 25px; border-radius: 12px; width: 90%; max-width: 360px; border: 1px solid #2a2e3f; }
-        .modal-content h3 { margin-bottom: 15px; color: #f3ba2f; text-align: center; }
-        .modal-content input { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 6px; color: white; margin-bottom: 12px; outline: none; }
-        .modal-content button { width: 100%; padding: 12px; background: #f3ba2f; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #1e2329; }
-        .modal-close { text-align: center; margin-top: 10px; color: #848e9c; cursor: pointer; font-size: 14px; }
+        .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #1c2030; padding: 30px; border-radius: 20px; width: 90%; max-width: 380px; border: 1px solid #2d3346; }
+        .modal-content h3 { margin-bottom: 22px; color: #f3ba2f; text-align: center; font-size: 24px; }
+        .modal-content input { width: 100%; padding: 15px; background: #202434; border: 1px solid #474d57; border-radius: 10px; color: white; margin-bottom: 16px; font-size: 16px; outline: none; }
+        .modal-content button { width: 100%; padding: 15px; background: #f3ba2f; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: #1e2329; font-size: 18px; }
+        .modal-close { text-align: center; margin-top: 15px; color: #848e9c; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -96,73 +103,73 @@
         
         <div id="auth-guest-view" class="auth-buttons">
             <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
-            <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
+            <button class="btn-register" onclick="openModal('register-modal')">Register</button>
         </div>
 
         <div id="auth-user-view" class="user-logged-in" onclick="switchTab('profile')">
-            <span>👤 <span id="display-header-name" class="user-name">---</span></span>
+            <span>👤 <span id="display-header-name" class="user-name">---</span> <span class="eye-icon">🔵</span></span>
         </div>
     </div>
 
     <div class="nav-tabs">
-        <div id="tab-home" class="tab active" onclick="switchTab('home')">🏠 Home</div>
-        <div id="tab-trade" class="tab" onclick="switchTab('trade')">🔄 P2P Trade</div>
-        <div id="tab-guide" class="tab" onclick="switchTab('guide')">📖 Guide</div>
+        <div id="tab-home" class="tab active" onclick="switchTab('home')"><span>🏠</span><span>Home</span></div>
+        <div id="tab-trade" class="tab" onclick="switchTab('trade')"><span>🔄</span><span>P2P Trade</span></div>
+        <div id="tab-guide" class="tab" onclick="switchTab('guide')"><span>📖</span><span>Guide</span></div>
     </div>
 
     <div id="view-home" class="page-view active">
         <div class="card">
-            <p style="color: #848e9c; font-size: 14px;">📈 Withdrawal Rate (BEP20 USDT)</p>
+            <p class="card-title">📈 Withdrawal Rate (BEP20 USDT)</p>
             <div class="rate-row">
                 <span>Under 10 USDT</span>
-                <strong style="color: #f3ba2f;">170 ETB</strong>
+                <strong style="color: #f3ba2f;">160 ETB</strong>
             </div>
             <div class="rate-row">
                 <span>10+ USDT</span>
-                <strong style="color: #f3ba2f;">175 ETB</strong>
+                <strong style="color: #f3ba2f;">170 ETB</strong>
             </div>
         </div>
 
         <div class="card">
-            <p style="color: #848e9c; font-size: 14px;">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</p>
+            <p class="card-title">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</p>
             
             <div id="before-generate">
-                <p style="font-size: 13px; margin-top: 5px; color: #b7bdc6;">Generate your unique BEP20 USDT deposit address (የራሶን የBEP20 አድራሻ ያውጡ)</p>
+                <p style="font-size: 15px; margin-top: 8px; color: #b7bdc6; line-height: 1.5;">Generate your unique BEP20 USDT deposit address (የራሶን የBEP20 አድራሻ ያውጡ)</p>
                 <button class="btn-yellow" onclick="generateAddress()">Generate BEP20 Address</button>
             </div>
 
             <div id="after-generate" style="display: none;">
-                <p style="font-size: 13px; margin-top: 5px; color: #b7bdc6;">Your unique BEP20 deposit address is ready:</p>
+                <p style="font-size: 15px; margin-top: 8px; color: #b7bdc6;">Your unique BEP20 deposit address is ready:</p>
                 <div class="address-box">
-                    <code style="color: #f3ba2f; font-size: 14px;">0x71C5A6C289DA574E70A7E7D5D3A2E2CAAE15A6C</code>
-                    <p style="font-size: 12px; color: #848e9c; margin-top: 5px; cursor: pointer;" onclick="alert('አድራሻው ኮፒ ተደርጓል!')">📋 Copy BEP20 Address</p>
+                    <code style="color: #f3ba2f; font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">0x71C5A6C289DA574E70A7E7D5D3A2E2CAAE15A6C</code>
+                    <p style="font-size: 14px; color: #848e9c; margin-top: 10px; cursor: pointer;" onclick="alert('አድራሻው ኮፒ ተደርጓል!')">📋 Copy BEP20 Address</p>
                 </div>
                 <button class="btn-green">Address Generated!</button>
             </div>
         </div>
 
         <div class="card">
-            <p style="color: #848e9c; font-size: 14px;">🏆 Top Withdrawals (ታላላቅ ክፍያዎች)</p>
+            <p class="card-title">🏆 Top Withdrawals (ታላላቅ ክፍያዎች)</p>
             <div class="withdrawal-item">
                 <div class="user-info">
                     <div class="rank-num">1</div>
                     <div>
-                        <p style="font-weight: bold;">Sen*** Hai***</p>
-                        <p style="font-size: 11px; color: #848e9c;">0976***87</p>
+                        <p style="font-weight: bold; font-size: 16px;">Sen*** Hai***</p>
+                        <p style="font-size: 13px; color: #848e9c;">0976***87</p>
                     </div>
                 </div>
                 <div style="text-align: right;">
-                    <p style="color: #f3ba2f; font-weight: bold;">6,142 ETB 🏆</p>
-                    <p style="font-size: 11px; color: #848e9c;">18 Payments</p>
+                    <p style="color: #f3ba2f; font-weight: bold; font-size: 17px;">6,142 ETB 🏆</p>
+                    <p style="font-size: 13px; color: #848e9c;">18 Payments</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="view-trade" class="page-view">
-        <div class="card" style="text-align: center; padding: 25px 15px;">
-            <div style="font-size: 40px; margin-bottom: 10px;">👑</div>
-            <h3 style="color: #f3ba2f; margin-bottom: 20px;">Forex P2P Squad</h3>
+        <div class="card" style="text-align: center; padding: 30px 15px;">
+            <div style="font-size: 55px; margin-bottom: 12px;">👑</div>
+            <h3 style="color: #f3ba2f; margin-bottom: 28px; font-size: 24px;">Forex P2P Squad</h3>
             
             <div class="trade-container">
                 <button class="btn-trade buy" onclick="openOrderForm('BUY')">
@@ -177,7 +184,7 @@
 
     <div id="view-order-form" class="page-view">
         <div class="card">
-            <h3 id="order-form-title" style="margin-bottom: 20px; text-align: center;">---</h3>
+            <h3 id="order-form-title" style="margin-bottom: 25px; text-align: center; font-size: 22px;">---</h3>
             
             <div class="input-group">
                 <label>የሚፈልጉት የዶላር መጠን ($)</label>
@@ -210,9 +217,9 @@
             <div class="sub-title">የእርስዎ ፕሮፋይል</div>
 
             <div class="avatar-box">
-                <span style="font-size: 35px; color: #848e9c;">👤</span>
+                <span style="font-size: 45px; color: #848e9c;">👤</span>
                 <span id="profile-card-name" class="u-name">---</span>
-                <span class="u-role">የተከበረ የቡድናችን አባል</span>
+                <span style="color: #848e9c; font-size: 13px; margin-top: 3px;">የተከበረ የቡድናችን አባል</span>
             </div>
 
             <div class="info-list">
@@ -234,8 +241,8 @@
 
     <div id="view-guide" class="page-view">
         <div class="card">
-            <h3 style="color: #f3ba2f; margin-bottom: 15px;">📖 መመሪያና መረጃ</h3>
-            <p style="color: #b7bdc6; line-height: 1.6; font-size: 14px;">
+            <h3 style="color: #f3ba2f; margin-bottom: 18px; font-size: 20px;">📖 መመሪያና መረጃ</h3>
+            <p style="color: #b7bdc6; line-height: 1.7; font-size: 16px;">
                 እንኳን ወደ Forex P2P Squad በደህና መጡ! ይህ መተግበሪያ በታማኝነት እና በፍጥነት የ USDT ግዢና ሽያጭ ለመፈጸም ይረዳዎታል።<br><br>
                 1. <strong>USDT ለመግዛት፦</strong> P2P Trade ውስጥ በመግባት Buy የሚለውን ይጫኑ።<br>
                 2. <strong>USDT ለመሸጥ፦</strong> Sell የሚለውን በመጫን የባንክ አካውንትዎን በትክክል ይሙሉ።
@@ -284,7 +291,6 @@
         if (targetTab) targetTab.classList.add('active');
     }
 
-    // 🔄 አድራሻ ለማውጣት (Generate Address)
     function generateAddress() {
         const checkUser = localStorage.getItem('currentUser');
         if (!checkUser) {
@@ -296,7 +302,6 @@
         document.getElementById('after-generate').style.display = 'block';
     }
 
-    // ገጹ ሲከፈት የድሮ አካውንት ካለ ማስታወስ
     window.onload = function() {
         const savedUser = localStorage.getItem('currentUser');
         if (savedUser) {
@@ -335,8 +340,7 @@
             }
         }
         
-        // ከሌለ በጊዜያዊ ስም ያስገባዋል
-        loginUserSuccess("User_" + phone.substring(0,4), phone);
+        loginUserSuccess("✍️ " + phone.substring(0,4), phone);
         closeModal('login-modal');
     }
 
