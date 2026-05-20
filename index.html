@@ -1,383 +1,246 @@
-<!DOCTYPE html>
-<html lang="am">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex P2P Squad</title>
+Import telebot
+from telebot import types
+import os
+
+# 1. መረጃዎችን ከ Railway Variables መሳብ
+TOKEN = os.getenv('BOT_TOKEN')
+ADMIN_ID = os.getenv('ADMIN_ID')  # የአንተ የቴሌግራም ID (በቁጥር)
+CHANNEL_USERNAME = os.getenv('CHANNEL_USERNAME')
+
+bot = telebot.TeleBot(TOKEN)
+
+# የመግዣ እና የመሸጫ ዋጋዎች ለየብቻ (በመጀመሪያ መነሻ እዚህ ይቀመጣሉ)
+BUY_RATE = 185.0   # ደንበኛ ከአንተ የሚገዛበት ዋጋ
+SELL_RATE = 175.0  # ደንበኛ ለአንተ የሚሸጥበት ዋጋ
+
+# የተጠቃሚዎችን የግብይት ሂደት ለመያዝ
+user_sessions = {}
+
+def is_subscribed(user_id):
+    try:
+        status = bot.get_chat_member(CHANNEL_USERNAME, user_id).status
+        return status in ['member', 'administrator', 'creator']
+    except:
+        return False
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    if not is_subscribed(message.from_user.id):
+        markup = types.InlineKeyboardMarkup()
+        btn_join = types.InlineKeyboardButton("🔥 JOIN CHANNEL 🔥", url=f"https://t.me/{CHANNEL_USERNAME[1:]}")
+        btn_check = types.InlineKeyboardButton("🔄 አረጋግጥ", callback_data="check_sub")
+        markup.add(btn_join)
+        markup.add(btn_check)
+        bot.send_message(message.chat.id, f"እንኳን መጡ! ቦቱን ለመጠቀም መጀመሪያ ቻናላችንን ይቀላቀሉ፦ {CHANNEL_USERNAME}", reply_markup=markup)
+        return
     
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    send_main_menu(message.chat.id)
 
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #131722; color: #ffffff; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 420px; background: #1c2030; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; }
-        
-        /* Header section with Logo and Profile/Auth Box */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .brand-logo { width: 40px; height: 40px; background: #f3ba2f; border-radius: 8px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
-        .brand-title h2 { font-size: 18px; color: white; }
-        .brand-title p { font-size: 12px; color: #848e9c; }
-        
-        /* Auth Area Styling (Login/Register) */
-        .auth-buttons { display: flex; flex-direction: column; gap: 5px; }
-        .btn-login { background: #f3ba2f; color: #1e2329; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-register { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        
-        /* Mini Profile Tag on Top Header */
-        .user-logged-in { display: none; align-items: center; gap: 8px; background: #25293a; padding: 8px 12px; border-radius: 20px; border: 1px solid #2a2e3f; cursor: pointer; }
-        .user-name { color: #f3ba2f; font-weight: bold; font-size: 14px; }
+# ለአድሚን ብቻ የመግዣ ዋጋ መለወጫ (/setbuy 122.5)
+@bot.message_handler(commands=['setbuy'])
+def set_buy_rate(message):
+    global BUY_RATE
+    if str(message.from_user.id) == str(ADMIN_ID):
+        try:
+            new_rate = float(message.text.split()[1])
+            BUY_RATE = new_rate
+            bot.reply_to(message, f"✅ የUSDT መግዣ ዋጋ ተቀይሯል!\n🟢 የአሁኑ መግዣ ዋጋ፦ `{BUY_RATE} ETB`", parse_mode="Markdown")
+        except:
+            bot.reply_to(message, "❌ እባክዎ በትክክል ያስገቡ። ምሳሌ፦ `/setbuy 122.5`", parse_mode="Markdown")
+    else:
+        bot.reply_to(message, "❌ ይህንን ለማድረግ ፈቃድ የለዎትም።")
 
-        /* Navigation Tabs */
-        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-        .tab { flex: 1; background: #25293a; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #2a2e3f; cursor: pointer; font-size: 14px; color: #b7bdc6; }
-        .tab.active { border-color: #f3ba2f; color: white; background: #1e2232; }
+# ለአድሚን ብቻ የመሸጫ ዋጋ መለወጫ (/setsell 120.0)
+@bot.message_handler(commands=['setsell'])
+def set_sell_rate(message):
+    global SELL_RATE
+    if str(message.from_user.id) == str(ADMIN_ID):
+        try:
+            new_rate = float(message.text.split()[1])
+            SELL_RATE = new_rate
+            bot.reply_to(message, f"✅ የUSDT መሸጫ ዋጋ ተቀይሯል!\n🔴 የአሁኑ መሸጫ ዋጋ፦ `{SELL_RATE} ETB`", parse_mode="Markdown")
+        except:
+            bot.reply_to(message, "❌ እባክዎ በትክክል ያስገቡ። ምሳሌ፦ `/setsell 120.0`", parse_mode="Markdown")
+    else:
+        bot.reply_to(message, "❌ ይህንን ለማድረግ ፈቃድ የለዎትም።")
 
-        /* Multi-Page Views Control */
-        .page-view { display: none; }
-        .page-view.active { display: block; }
-
-        /* Content Cards Design */
-        .card { background: #171a26; border: 1px solid #25293a; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .rate-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
-        .address-box { background: #232838; border: 1px solid #f3ba2f; border-style: dashed; padding: 15px; border-radius: 8px; text-align: center; margin-top: 10px; }
-        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        
-        /* Top Withdrawals List */
-        .withdrawal-item { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 14px; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .rank-num { width: 24px; height: 24px; border: 1px solid #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #f3ba2f; }
-
-        /* P2P Trade Screen (Buy/Sell) */
-        .trade-container { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
-        .btn-trade { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 8px; font-size: 18px; font-weight: bold; text-decoration: none; color: white; border: 2px solid #343a40; background: #171a26; transition: 0.2s; cursor: pointer; }
-        .btn-trade.buy { border-color: #0ecb81; }
-        .btn-trade.sell { border-color: #f6465d; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .dot.green { background-color: #0ecb81; box-shadow: 0 0 8px #0ecb81; }
-        .dot.red { background-color: #f6465d; box-shadow: 0 0 8px #f6465d; }
-
-        /* Profile Details Screen */
-        .profile-card { background: #1c2030; text-align: center; padding: 20px 10px; }
-        .crown-icon { font-size: 50px; margin-bottom: 5px; }
-        .main-title { color: #f3ba2f; font-size: 22px; margin-bottom: 15px; font-weight: bold; }
-        .sub-title { color: #b7bdc6; font-size: 16px; margin-bottom: 20px; }
-        .avatar-box { background: #25293a; width: 100px; height: 100px; border-radius: 12px; margin: 0 auto 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #2a2e3f; }
-        .avatar-box img { width: 45px; height: 45px; opacity: 0.6; }
-        .avatar-box .u-name { color: #f3ba2f; font-weight: bold; margin-top: 5px; font-size: 15px; }
-        .avatar-box .u-role { color: #848e9c; font-size: 11px; }
-        .info-list { text-align: left; background: #171a26; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #25293a; }
-        .info-item { margin-bottom: 12px; font-size: 15px; color: #b7bdc6; display: flex; align-items: center; gap: 8px; }
-        .btn-logout { width: 100%; padding: 14px; background: #2b3139; color: #f6465d; border: 1px solid #474d57; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-
-        /* Form Controls */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; color: #848e9c; font-size: 14px; }
-        .input-group input, .input-group select { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 8px; color: white; font-size: 16px; outline: none; }
-        .input-group input:focus { border-color: #f3ba2f; }
-        .btn-back { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; margin-top: 15px; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-        /* Modal Forms Popup */
-        .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #1c2030; padding: 25px; border-radius: 12px; width: 90%; max-width: 360px; border: 1px solid #2a2e3f; }
-        .modal-content h3 { margin-bottom: 15px; color: #f3ba2f; text-align: center; }
-        .modal-content input { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 6px; color: white; margin-bottom: 12px; outline: none; }
-        .modal-content button { width: 100%; padding: 12px; background: #f3ba2f; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #1e2329; }
-        .modal-close { text-align: center; margin-top: 10px; color: #848e9c; cursor: pointer; font-size: 14px; }
-    </style>
-</head>
-<body>
-
-<div class="app-container">
+def send_main_menu(chat_id):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     
-    <div class="header-top">
-        <div class="brand">
-            <div class="brand-logo">👑</div>
-            <div class="brand-title">
-                <h2>Forex P2P</h2>
-                <p>Squad</p>
-            </div>
-        </div>
+    # 🔙 ልክ እንደ ድሮው ተራ በተን ሆኗል (ምንም WebApp ኮድ የለበትም)
+    btn1 = types.KeyboardButton("💸 USDT መግዛት/መሸጥ (P2P)")
+    btn2 = types.KeyboardButton("📣 ማስታወቂያ ለማሰራት")
+    btn3 = types.KeyboardButton("🔱 Tutorial & Info")
+    btn4 = types.KeyboardButton("🌟 Donate (Stars/TON)")
+    btn5 = types.KeyboardButton("🙋‍♂️ ጥያቄና ሀሳብ")
+
+    markup.add(btn1)
+    markup.add(btn2, btn3)
+    markup.add(btn4, btn5)
+
+    welcome_text = "እንኳን ወደ **Forex p2p squad** በደህና መጡ! 🚀\n\nእባክዎ ከታች ካሉት አማራጮች የሚፈልጉትን ይምረጡ。"
+    bot.send_message(chat_id, welcome_text, reply_markup=markup, parse_mode="Markdown")
+
+@bot.message_handler(func=lambda message: True)
+def handle_messages(message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+    text = message.text
+
+    # 1. የ P2P በተን (ጽሑፍና ዋጋ ብቻ የሚያሳየው የድሮው አሰራር)
+    if "USDT" in text and "P2P" in text:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        btn_buy = types.KeyboardButton("🟢 USDT መግዛት እፈልጋለሁ")
+        btn_sell = types.KeyboardButton("🔴 USDT መሸጥ እፈልጋለሁ")
+        btn_back = types.KeyboardButton("🔙 ወደ ዋናው ማውጫ")
+        markup.add(btn_buy, btn_sell)
+        markup.add(btn_back)
         
-        <div id="auth-guest-view" class="auth-buttons">
-            <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
-            <button class="btn-register" onclick="openModal('register-modal')">Register</button>
-        </div>
+        rate_text = (
+            f"📊 **የአሁኑ የUSDT የገበያ ዋጋ፦**\n\n"
+            f"🟢 **እኛ የምንሸጥበት (መግዛት ሲፈልጉ)፦** `{BUY_RATE} ETB`\n"
+            f"🔴 **እኛ የምንገዛበት (መሸጥ ሲፈልጉ)፦** `{SELL_RATE} ETB`\n\n"
+            f"ምን ማድረግ ይፈልጋሉ?"
+        )
+        bot.send_message(chat_id, rate_text, reply_markup=markup, parse_mode="Markdown")
 
-        <div id="auth-user-view" class="user-logged-in" onclick="switchTab('profile')">
-            <span>👤 <span id="display-header-name" class="user-name">---</span></span>
-        </div>
-    </div>
+    elif "መግዛት እፈልጋለሁ" in text or "መሸጥ እፈልጋለሁ" in text:
+        action = "BUY" if "መግዛት" in text else "SELL"
+        user_sessions[user_id] = {"action": action}
+        msg = bot.send_message(chat_id, "🔢 እባክዎ የሚፈልጉትን የUSDT መጠን በቁጥር ብቻ ያስገቡ፦\n*(ለምሳሌ፦ 50)*")
+        bot.register_next_step_handler(msg, calculate_p2p)
 
-    <div class="nav-tabs">
-        <div id="tab-home" class="tab active" onclick="switchTab('home')">🏠 Home</div>
-        <div id="tab-trade" class="tab" onclick="switchTab('trade')">🔄 P2P Trade</div>
-        <div id="tab-guide" class="tab" onclick="switchTab('guide')">📖 Guide</div>
-    </div>
+    # 2. የ ታይቶሪያል በተን
+    elif "Tutorial" in text or "Info" in text or "🔱" in text:
+        tutorial_text = (
+            "🔱 **ስለ Ethio Free Server ቦት** 🔱\n\n"
+            "ይህ ቦት የተመሰረተው የክሪፕቶ ግብይትን (P2P) ለኢትዮጵያውያን ለማቅለል እና ለማገዝ ነው።\n\n"
+            "📖 **መመሪያዎች፦**\n"
+            "1️⃣ **P2P ግብይት:** እዚህ ጋር USDT መግዛትና መሸጥ ይችላሉ። ቦቱ መግዛት ወይስ መሸጥ እንደፈለጉ አይቶ በየራሳቸው ዋጋ ያሰላልዎታል።\n"
+            "2️⃣ **Ads (ማስታወቂያ):** የእርስዎን ምርት ወይም አገልግሎት በቻናላችን ላይ ማስተዋወቅ ሲፈልጉ የሚጠቀሙበት ነው።\n"
+            "3️⃣ **ደህንነት:** ማንኛውም ግብይት በአድሚኑ @Crypto2115 አማካኝነት በታማኝነት የሚፈጸም ይሆናል።\n\n"
+            "ቦቱን ስለተጠቀሙ እናመሰግናለን!"
+        )
+        bot.send_message(chat_id, tutorial_text, parse_mode="Markdown")
 
-    <div id="view-home" class="page-view active">
-        <div class="card">
-            <p style="color: #848e9c; font-size: 14px;">📈 Withdrawal Rate (BEP20 USDT)</p>
-            <div class="rate-row">
-                <span>Under 10 USDT</span>
-                <strong style="color: #f3ba2f;">170 ETB</strong>
-            </div>
-            <div class="rate-row">
-                <span>10+ USDT</span>
-                <strong style="color: #f3ba2f;">175 ETB</strong>
-            </div>
-        </div>
+    # 3. የማስታወቂያ በተን
+    elif "ማስታወቂያ" in text:
+        msg = bot.send_message(chat_id, "📣 የማስታወቂያውን ዝርዝር ጽፈው ይላኩ። አድሚን አይቶ ያነጋግርዎታል።")
+        bot.register_next_step_handler(msg, process_ads)
 
-        <div class="card">
-            <p style="color: #848e9c; font-size: 14px;">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</p>
-            <p style="font-size: 13px; margin-top: 5px; color: #b7bdc6;">Your unique BEP20 deposit address is ready:</p>
-            
-            <div class="address-box">
-                <code style="color: #f3ba2f; font-size: 14px;">0x71C...I5a6C</code>
-                <p style="font-size: 12px; color: #848e9c; margin-top: 5px; cursor: pointer;" onclick="alert('አድራሻው ኮፒ ተደርጓል!')">📋 Copy BEP20 Address</p>
-            </div>
-            
-            <button class="btn-green">Address Generated!</button>
-        </div>
+    # 4. የዶኔሽን በተን
+    elif "Donate" in text or "Stars" in text or "TON" in text or "🌟" in text:
+        donate_text = (
+            "🌟 **ቦቱን ይደግፉ** 🌟\n\n"
+            "የቦቱን አገልግሎት ይበልጥ ለማሳደግ በቴሌግራም ስታርስ (Stars) ወይም በቶን (TON) ልገሳ ማድረግ ይችላሉ።\n\n"
+            "💎 **TON Wallet Address:**\n`UQDJz-8jU5JjyXJZYFj_XrSHuWeZdrQS0tahU2Ie5WWacpYp`\n\n"
+            "⭐ **Telegram Stars:**\nበቀጥታ አድሚኑን @Crypto2115 በማነጋገር በስጦታ መልክ መላክ ይችላሉ።\n\n"
+            "ለሚያደርጉት ድጋፍ ከልብ እናመሰግናለን! 🙏"
+        )
+        bot.send_message(chat_id, donate_text, parse_mode="Markdown")
 
-        <div class="card">
-            <p style="color: #848e9c; font-size: 14px;">🏆 Top Withdrawals (ታላላቅ ክፍያዎች)</p>
-            <div class="withdrawal-item">
-                <div class="user-info">
-                    <div class="rank-num">1</div>
-                    <div>
-                        <p style="font-weight: bold;">Sen*** Hai***</p>
-                        <p style="font-size: 11px; color: #848e9c;">0976***87</p>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <p style="color: #f3ba2f; font-weight: bold;">6,142 ETB 🏆</p>
-                    <p style="font-size: 11px; color: #848e9c;">18 Payments</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    # 5. ጥያቄና ሀሳብ በተን
+    elif "ጥያቄ" in text or "ሀሳብ" in text:
+        msg = bot.send_message(chat_id, "🙋‍♂️ እባክዎ የእርስዎን ጥያቄ ወይም አስተያየት ጽፈው ይላኩ። አድሚኑ ጋር በቀጥታ ይደርሳል።")
+        bot.register_next_step_handler(msg, process_feedback)
 
-    <div id="view-trade" class="page-view">
-        <div class="card" style="text-align: center; padding: 25px 15px;">
-            <div style="font-size: 40px; margin-bottom: 10px;">👑</div>
-            <h3 style="color: #f3ba2f; margin-bottom: 20px;">Forex P2P Squad</h3>
-            
-            <div class="trade-container">
-                <button class="btn-trade buy" onclick="openOrderForm('BUY')">
-                    <div class="dot green"></div> Buy USDT
-                </button>
-                <button class="btn-trade sell" onclick="openOrderForm('SELL')">
-                    <div class="dot red"></div> Sell USDT
-                </button>
-            </div>
-        </div>
-    </div>
+    # 6. ወደ ዋናው ማውጫ መመለሻ
+    elif "ዋናው ማውጫ" in text or "🔙" in text:
+        send_main_menu(chat_id)
 
-    <div id="view-order-form" class="page-view">
-        <div class="card">
-            <h3 id="order-form-title" style="margin-bottom: 20px; text-align: center;">---</h3>
-            
-            <div class="input-group">
-                <label>የሚፈልጉት የዶላር መጠን ($)</label>
-                <input type="number" id="order-amount" placeholder="ለምሳሌ፦ 50">
-            </div>
-            
-            <div id="bank-input-group" class="input-group">
-                <label>የባንክ አካውንት ቁጥር</label>
-                <input type="text" id="order-bank-acc" placeholder="ገንዘብ የሚቀበሉበትን አካውንት ያስገቡ">
-            </div>
+# የP2P ስሌት መስሪያ
+def calculate_p2p(message):
+    user_id = message.from_user.id
+    chat_id = message.chat.id
+    
+    if "ዋናው ማውጫ" in message.text or "🔙" in message.text:
+        send_main_menu(chat_id)
+        return
 
-            <div class="input-group">
-                <label>የመክፈያ/የመቀበያ ዘዴ</label>
-                <select id="order-method">
-                    <option>CBE (የኢትዮጵያ ንግድ ባንክ)</option>
-                    <option>Telebirr (ቴሌብር)</option>
-                    <option>BOA (አቢሲኒያ ባንክ)</option>
-                </select>
-            </div>
-
-            <button id="btn-submit-order" class="btn-green" onclick="submitOrder()">ትዕዛዝ ላክ (Submit)</button>
-            <button class="btn-back" onclick="switchTab('trade')">⬅️ ተመለስ</button>
-        </div>
-    </div>
-
-    <div id="view-profile" class="page-view">
-        <div class="card profile-card">
-            <div class="crown-icon">👑</div>
-            <div class="main-title">Forex P2P Squad</div>
-            <div class="sub-title">የእርስዎ ፕሮፋይል</div>
-
-            <div class="avatar-box">
-                <span style="font-size: 35px; color: #848e9c;">👤</span>
-                <span id="profile-card-name" class="u-name">---</span>
-                <span class="u-role">የተከበረ የቡድናችን አባል</span>
-            </div>
-
-            <div class="info-list">
-                <div class="info-item">
-                    <span>📌</span> <strong>የአባልነት ስም፦</strong> <span id="info-name">---</span>
-                </div>
-                <div class="info-item">
-                    <span>📞</span> <strong>ስልክ ቁጥር፦</strong> <span id="info-phone">---</span>
-                </div>
-                <div class="info-item">
-                    <span>💼</span> <strong>የአካውንት ሁኔታ፦</strong> <span style="color: #0ecb81; font-weight: bold;">Active ✅</span>
-                </div>
-            </div>
-
-            <button class="btn-logout" onclick="handleLogout()">ውጣ (Logout)</button>
-            <button class="btn-back" onclick="switchTab('home')">⬅️ ወደ ሆም ተመለስ</button>
-        </div>
-    </div>
-
-    <div id="view-guide" class="page-view">
-        <div class="card">
-            <h3 style="color: #f3ba2f; margin-bottom: 15px;">📖 መመሪያና መረጃ</h3>
-            <p style="color: #b7bdc6; line-height: 1.6; font-size: 14px;">
-                እንኳን ወደ Forex P2P Squad በደህና መጡ! ይህ መተግበሪያ በታማኝነት እና በፍጥነት የ USDT ግዢና ሽያጭ ለመፈጸም ይረዳዎታል።<br><br>
-                1. <strong>USDT ለመግዛት፦</strong> P2P Trade ውስጥ በመግባት Buy የሚለውን ይጫኑ።<br>
-                2. <strong>USDT ለመሸጥ፦</strong> Sell የሚለውን በመጫን የባንክ አካውንትዎን በትክክል ይሙሉ።
-            </p>
-        </div>
-    </div>
-
-</div>
-
-<div id="login-modal" class="auth-modal">
-    <div class="modal-content">
-        <h3>Login (ግባ)</h3>
-        <input type="tel" id="login-phone" placeholder="ስልክ ቁጥር">
-        <input type="password" id="login-pass" placeholder="የይለፍ ቃል">
-        <button onclick="processLogin()">ግባ</button>
-        <div class="modal-close" onclick="closeModal('login-modal')">❌ ዝጋ</div>
-    </div>
-</div>
-
-<div id="register-modal" class="auth-modal">
-    <div class="modal-content">
-        <h3>Register (ተመዝገብ)</h3>
-        <input type="text" id="reg-name" placeholder="ሙሉ ስም">
-        <input type="tel" id="reg-phone" placeholder="ስልክ ቁጥር">
-        <input type="password" id="reg-pass" placeholder="ፓስወርድ">
-        <button onclick="processRegister()">ተመዝገብ</button>
-        <div class="modal-close" onclick="closeModal('register-modal')">❌ ዝጋ</div>
-    </div>
-</div>
-
-
-<script>
-    let currentOrderType = 'BUY';
-
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    // 🔄 ገጾችን ለመቀያየር የሚያገለግል ፈንክሽን
-    function switchTab(tabName) {
-        // ሁሉንም ገጾች ደብቅ
-        document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-        document.querySelectorAll('.nav-tabs .tab').forEach(t => t.classList.remove('active'));
-
-        // የተመረጠውን ገጽ አሳይ
-        const targetView = document.getElementById('view-' + tabName);
-        if (targetView) targetView.classList.add('active');
-
-        // የታብ ምልክቱን አብራ (ከመመሪያ እና ፕሮፋይል ውጪ)
-        const targetTab = document.getElementById('tab-' + tabName);
-        if (targetTab) targetTab.classList.add('active');
-    }
-
-    // ገጹ ሲከፈት ከተጠቃሚው ስልክ ላይ መረጃን ማስታወስ (Remember Me)
-    window.onload = function() {
-        // የቴሌግራም መረጃ ካለ በራሱ ያነባል
-        if (window.Telegram && window.Telegram.WebApp) {
-            const tg = window.Telegram.WebApp;
-            tg.ready();
-            const user = tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
-            if (user) {
-                const fullName = (user.first_name + " " + (user.last_name || "")).trim();
-                loginUserSuccess(fullName, "Telegram Account");
-                return;
-            }
-        }
-
-        // በብሮውዘር ከሆነ
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            const u = JSON.parse(savedUser);
-            loginUserSuccess(u.name, u.phone);
-        }
-    };
-
-    function processRegister() {
-        const name = document.getElementById('reg-name').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        if (!name || !phone) { alert('እባክዎ ሁሉንም ይሙሉ!'); return; }
+    try:
+        amount = float(message.text)
+        session = user_sessions.get(user_id, {"action": "BUY"})
         
-        loginUserSuccess(name, phone);
-        closeModal('register-modal');
-    }
-
-    function processLogin() {
-        const phone = document.getElementById('login-phone').value.trim();
-        if (!phone) { alert('እባክዎ ስልክ ቁጥር ያስገቡ!'); return; }
+        if session["action"] == "BUY":
+            current_rate = BUY_RATE
+            action_text = "🟢 መግዛት"
+        else:
+            current_rate = SELL_RATE
+            action_text = "🔴 መሸጥ"
+            
+        total_etb = amount * current_rate
         
-        loginUserSuccess("User_" + phone.substring(0,4), phone);
-        closeModal('login-modal');
-    }
-
-    function loginUserSuccess(name, phone) {
-        localStorage.setItem('currentUser', JSON.stringify({ name: name, phone: phone }));
+        response = (
+            f"📊 **የ幕ሌት ውጤት ({action_text})**\n\n"
+            f"🔹 የUSDT መጠን: `{amount} USDT`\n"
+            f"🔹 የተሰላበት ዋጋ: `{current_rate} ETB`\n"
+            f"👉 **ጠቅላላ ክፍያ: `{total_etb:,.2f} ETB`**\n\n"
+            "ለመቀጠልና ግብይቱን ለመጀመር እርግጠኛ ነዎት?"
+        )
         
-        // 1. ከላይ ሄደሩን ቀይር
-        document.getElementById('auth-guest-view').style.display = 'none';
-        document.getElementById('auth-user-view').style.display = 'flex';
-        document.getElementById('display-header-name').innerText = name;
-
-        // 2. የፕሮፋይል ገጹን መረጃዎች በትክክል ሙላ
-        document.getElementById('profile-card-name').innerText = name;
-        document.getElementById('info-name').innerText = name;
-        document.getElementById('info-phone').innerText = phone;
-    }
-
-    function handleLogout() {
-        localStorage.removeItem('currentUser');
-        document.getElementById('auth-user-view').style.display = 'none';
-        document.getElementById('auth-guest-view').style.display = 'flex';
-        switchTab('home');
-    }
-
-    // የ Buy/Sell ፎርም መክፈቻ
-    function openOrderForm(type) {
-        currentOrderType = type;
-        document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-        document.getElementById('view-order-form').classWith = 'page-view active';
-        document.getElementById('view-order-form').classList.add('active');
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("✅ አዎ! እርግጠኛ ነኝ", callback_data=f"confirm_{session['action']}_{amount}"))
+        bot.send_message(chat_id, response, reply_markup=markup, parse_mode="Markdown")
         
-        const titleElement = document.getElementById('order-form-title');
-        const bankGroup = document.getElementById('bank-input-group');
-        const btnSubmit = document.getElementById('btn-submit-order');
+    except ValueError:
+        msg = bot.send_message(chat_id, "❌ እባክዎ መጠንን በቁጥር ብቻ ያስገቡ! (ለምሳሌ፦ 50)\nድጋሚ ይሞክሩ፦")
+        bot.register_next_step_handler(msg, calculate_p2p)
 
-        if (type === 'BUY') {
-            titleElement.innerText = "🟢 Buy USDT";
-            titleElement.style.color = "#0ecb81";
-            bankGroup.style.display = "none"; // ሲገዛ አካውንት አያስፈልግም
-            btnSubmit.style.background = "#0ecb81";
-        } else {
-            titleElement.innerText = "🔴 Sell USDT";
-            titleElement.style.color = "#f6465d";
-            bankGroup.style.display = "block"; // ሲሸጥ አካውንት ያስፈልጋል
-            btnSubmit.style.background = "#f6465d";
-        }
-    }
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    if call.data == "check_sub":
+        if is_subscribed(call.from_user.id):
+            bot.answer_callback_query(call.id, "ተሳክቷል!")
+            send_main_menu(call.message.chat.id)
+        else:
+            bot.answer_callback_query(call.id, "አሁንም ቻናሉን አልተቀላቀሉም!", show_alert=True)
+    
+    elif call.data.startswith("confirm_"):
+        parts = call.data.split("_")
+        action = parts[1] 
+        amount = float(parts[2])
+        
+        if action == "BUY":
+            current_rate = BUY_RATE
+            action_title = "🟢 መግዛት"
+        else:
+            current_rate = SELL_RATE
+            action_title = "🔴 መሸጥ"
+            
+        total_etb = amount * current_rate
+        
+        admin_msg = (
+            f"🔔 **አዲስ የP2P ጥያቄ መጥቷል!**\n\n"
+            f"👤 ተጠቃሚ፦ @{call.from_user.username if call.from_user.username else 'የለውም'}\n"
+            f"🆔 ID: `{call.from_user.id}`\n"
+            f"የተመረጠው፦ {action_title}\n"
+            f"💰 መጠን፦ `{amount} USDT`\n"
+            f"💵 ጠቅላላ ብር፦ `{total_etb:,.2f} ETB`"
+        )
+        bot.send_message(ADMIN_ID, admin_msg, parse_mode="Markdown")
+        bot.send_message(call.message.chat.id, "✅ ምርጫዎ ተመዝግቧል! አድሚኑ @Crypto2115 በውስጥ መስመር ያነጋግርዎታል።")
 
-    function submitOrder() {
-        const amount = document.getElementById('order-amount').value;
-        if (!amount) { alert('እባክዎ መጠን ያስገቡ!'); return; }
-        alert('✅ የ' + currentOrderType + ' ትዕዛዝዎ በተሳካ ሁኔታ ለአድሚኑ ተልኳል!');
-        switchTab('trade');
-    }
-</script>
+def process_ads(message):
+    if "ዋናው ማውጫ" in message.text or "🔙" in message.text:
+        send_main_menu(message.chat.id)
+        return
+        
+    bot.send_message(ADMIN_ID, f"📣 **የማስታወቂያ ጥያቄ፦**\n\nከ @{message.from_user.username}\nመልእክት፦ {message.text}")
+    bot.send_message(message.chat.id, "✅ የማስታወቂያ ጥያቄዎ ደርሷል። አድሚን ያነጋግርዎታል።")
 
-</body>
-</html>
+def process_feedback(message):
+    if "ዋናው ማውጫ" in message.text or "🔙" in message.text:
+        send_main_menu(message.chat.id)
+        return
+        
+    admin_msg = (
+        f"🙋‍♂️ **አዲስ አስተያየት/ጥያቄ ደርሶዎታል!**\n\n"
+        f"👤 ከ፦ @{message.from_user.username if message.from_user.username else 'የለውም'}\n"
+        f"🆔 ID: `{message.from_user.id}`\n"
+        f"📝 መልእክት፦ {message.text}"
+    )
+    bot.send_message(ADMIN_ID, admin_msg, parse_mode="Markdown")
+    bot.send_message(message.chat.id, "✅ አስተያየትዎ ወይም ጥያቄዎ በተሳካ ሁኔታ ለአድሚኑ ደርሷል። እናመሰግናለን!")
+
+if __name__ == "__main__":
+    bot.infinity_polling()
