@@ -6,85 +6,90 @@
     <title>Forex p2p squad</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #131722; color: #ffffff; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        body { background-color: #0d111a; color: #ffffff; padding: 12px; display: flex; justify-content: center; min-height: 100vh; }
         
-        /* 📱 ሙሉ ኮንቴይነሩ Size እንዲጨምር ተደርጓል */
-        .app-container { width: 100%; max-width: 440px; background: #161a25; padding: 25px; border-radius: 20px; box-shadow: 0 6px 25px rgba(0,0,0,0.5); }
+        /* 📱 ሙሉ ስክሪኑን እንዲሞላ ሰፊ የተደረገ ማከማቻ (Full Width Container) */
+        .app-container { width: 100%; max-width: 480px; background: #121622; padding: 22px; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; }
         
-        /* 🔝 TOP HEADER AREA (ትልቅ የተደረገ) */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-        .brand { display: flex; align-items: center; gap: 14px; }
-        .brand-logo { width: 52px; height: 52px; background: #f3ba2f; border-radius: 12px; font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(243,186,47,0.25); }
+        /* 🔝 TOP HEADER AREA (ትልቅ እና ግልጽ) */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-logo { width: 50px; height: 50px; background: #f3ba2f; border-radius: 12px; font-size: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(243,186,47,0.25); }
         .brand-title h2 { font-size: 22px; color: white; font-weight: bold; line-height: 1.1; }
-        .brand-title p { font-size: 15px; color: #848e9c; }
+        .brand-title p { font-size: 14px; color: #848e9c; }
         
         /* Auth Buttons Box */
-        .auth-buttons { display: flex; flex-direction: column; gap: 8px; }
-        .btn-login { background: #f3ba2f; color: #1e2329; border: none; padding: 10px 22px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-register { background: #202434; color: #b7bdc6; border: 1px solid #2d3346; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 15px; }
+        .auth-buttons { display: flex; flex-direction: column; gap: 6px; }
+        .btn-login { background: #0ecb81; color: #ffffff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .btn-register { background: #202434; color: #b7bdc6; border: 1px solid #2d3346; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; }
         
-        /* 👤 USER TAG (ትልቅ እና ጎላ ያለ) */
-        .user-logged-in { display: none; align-items: center; gap: 8px; background: #202434; padding: 10px 18px; border-radius: 25px; border: 1px solid #2d3346; cursor: pointer; font-size: 16px; }
+        /* 👤 USER TAG (ትልቅ ስታይል) */
+        .user-logged-in { display: none; align-items: center; gap: 8px; background: #1c2030; padding: 10px 16px; border-radius: 20px; border: 1px solid #2d3346; cursor: pointer; font-size: 16px; }
         .user-name { color: #f3ba2f; font-weight: bold; font-style: italic; }
         .eye-icon { color: #3b82f6; margin-left: 4px; font-size: 15px; }
 
-        /* 🗂️ NAVIGATION TABS (ትልልቅ በተኖች) */
-        .nav-tabs { display: flex; gap: 12px; margin-bottom: 28px; }
-        .tab { flex: 1; background: #1e2232; padding: 16px 12px; border-radius: 12px; text-align: center; border: 1px solid #252a3e; cursor: pointer; font-size: 16px; color: #b7bdc6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-weight: bold; }
-        .tab.active { border-color: #f3ba2f; color: #f3ba2f; background: #161a25; }
+        /* 🗂️ NAVIGATION TABS */
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 5px; }
+        .tab { flex: 1; background: #181d2a; padding: 15px 10px; border-radius: 12px; text-align: center; border: 1px solid #22293a; cursor: pointer; font-size: 16px; color: #b7bdc6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; font-weight: bold; }
+        .tab.active { border-color: #0ecb81; color: #0ecb81; background: #121622; }
 
         /* Page Views Control */
         .page-view { display: none; }
         .page-view.active { display: block; }
 
-        /* Content Cards */
-        .card { background: #1c2030; border: 1px solid #252a3e; border-radius: 18px; padding: 22px; margin-bottom: 22px; }
-        .card-title { color: #848e9c; font-size: 16px; font-weight: 500; margin-bottom: 5px; }
+        /* Content Cards (ትልልቅ የካርድ መጠኖች) */
+        .card { background: #161b26; border: 1px solid #22293a; border-radius: 16px; padding: 20px; margin-bottom: 18px; }
+        .card-title { color: #848e9c; font-size: 16px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
         .rate-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 18px; }
-        .address-box { background: #161a25; border: 1px solid #f3ba2f; border-style: dashed; padding: 18px; border-radius: 12px; text-align: center; margin-top: 15px; word-break: break-all; }
+        .address-box { background: #121622; border: 1px solid #f3ba2f; border-style: dashed; padding: 18px; border-radius: 12px; text-align: center; margin-top: 15px; word-break: break-all; }
         
-        /* 🔥 የቅጽበታዊ በተኖች መጠን ጨምሯል */
-        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 18px; cursor: pointer; }
-        .btn-yellow { width: 100%; background: linear-gradient(180deg, #f3ba2f 0%, #dca41b 100%); color: #1e2329; border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 18px; cursor: pointer; box-shadow: 0 5px 15px rgba(243,186,47,0.3); }
+        /* 🔥 BIG BUTTONS */
+        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .btn-yellow { width: 100%; background: linear-gradient(180deg, #f3ba2f 0%, #dca41b 100%); color: #1e2329; border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(243,186,47,0.25); }
         
-        /* Top Withdrawals List */
-        .withdrawal-item { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; font-size: 16px; }
-        .user-info { display: flex; align-items: center; gap: 14px; }
-        .rank-num { width: 30px; height: 30px; border: 1px solid #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #f3ba2f; font-weight: bold; }
+        /* 🏆 TOP WITHDRAWALS LIST (እስከ 5 ተጠቃሚዎች የደረሰ ትልቅ ዝርዝር) */
+        .sub-txt { color: #848e9c; font-size: 14px; margin-bottom: 15px; }
+        .withdrawal-list-box { display: flex; flex-direction: column; gap: 12px; }
+        .withdrawal-item { display: flex; justify-content: space-between; align-items: center; background: #121622; padding: 14px 16px; border-radius: 12px; border: 1px solid #1c2232; font-size: 16px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .rank-num { width: 32px; height: 32px; border: 2px solid #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #f3ba2f; font-weight: bold; background: rgba(243,186,47,0.05); }
 
-        /* P2P Trade Buttons (ትልልቅ የ Buy/Sell ቁልፎች) */
+        /* P2P Trade Buttons */
         .trade-container { display: flex; flex-direction: column; gap: 18px; margin-top: 15px; }
-        .btn-trade { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 20px; border-radius: 12px; font-size: 21px; font-weight: bold; color: white; border: 2px solid #2d3346; background: #1c2030; transition: 0.2s; cursor: pointer; }
+        .btn-trade { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 22px; border-radius: 14px; font-size: 22px; font-weight: bold; color: white; border: 2px solid #2d3346; background: #161b26; transition: 0.2s; cursor: pointer; }
         .btn-trade.buy { border-color: #0ecb81; }
         .btn-trade.sell { border-color: #f6465d; }
         .dot { width: 14px; height: 14px; border-radius: 50%; }
         .dot.green { background-color: #0ecb81; box-shadow: 0 0 10px #0ecb81; }
         .dot.red { background-color: #f6465d; box-shadow: 0 0 10px #f6465d; }
 
-        /* Profile Details Screen */
-        .profile-card { text-align: center; padding: 25px 12px; }
-        .crown-icon { font-size: 65px; margin-bottom: 8px; }
-        .main-title { color: #f3ba2f; font-size: 28px; margin-bottom: 15px; font-weight: bold; }
-        .sub-title { color: #b7bdc6; font-size: 19px; margin-bottom: 28px; }
-        .avatar-box { background: #202434; width: 120px; height: 120px; border-radius: 20px; margin: 0 auto 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #2d3346; }
-        .avatar-box .u-name { font-size: 18px; color: #f3ba2f; font-weight: bold; margin-top: 8px; }
-        .info-list { text-align: left; background: #161a25; padding: 22px; border-radius: 16px; margin-bottom: 28px; border: 1px solid #252a3e; }
-        .info-item { margin-bottom: 18px; font-size: 17px; color: #b7bdc6; display: flex; align-items: center; gap: 12px; }
-        .btn-logout { width: 100%; padding: 16px; background: #202434; color: #f6465d; border: 1px solid #474d57; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        /* 📖 GUIDE STEP-BY-STEP DESIGN (ልክ በፎቶው ላይ እንዳለው) */
+        .guide-container { display: flex; flex-direction: column; gap: 20px; position: relative; margin-top: 15px; }
+        .guide-step { display: flex; gap: 16px; position: relative; }
+        .step-left { display: flex; flex-direction: column; align-items: center; }
+        .step-number { width: 36px; height: 36px; background: #121622; border: 2px solid #0ecb81; border-radius: 50%; color: #0ecb81; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; z-index: 2; }
+        .step-line { width: 2px; flex-grow: 1; background: #22293a; margin-top: 4px; margin-bottom: -24px; }
+        .guide-step:last-child .step-line { display: none; }
+        .step-content { background: #121622; padding: 15px; border-radius: 12px; flex-grow: 1; border: 1px solid #1c2232; }
+        .step-title { font-weight: bold; color: #ffffff; font-size: 16px; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .step-desc { color: #848e9c; font-size: 14px; line-height: 1.5; }
+        
+        .lang-switch { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-lang { background: #1c2232; border: 1px solid #2d3346; color: white; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
         /* Form Controls */
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; margin-bottom: 8px; color: #848e9c; font-size: 16px; }
-        .input-group input, .input-group select { width: 100%; padding: 15px; background: #202434; border: 1px solid #474d57; border-radius: 12px; color: white; font-size: 18px; outline: none; }
-        .input-group input:focus { border-color: #f3ba2f; }
-        .btn-back { background: #202434; color: #b7bdc6; border: 1px solid #474d57; margin-top: 18px; width: 100%; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .input-group input, .input-group select { width: 100%; padding: 16px; background: #1c2030; border: 1px solid #474d57; border-radius: 12px; color: white; font-size: 18px; outline: none; }
+        .input-group input:focus { border-color: #0ecb81; }
+        .btn-back { background: #1c2030; color: #b7bdc6; border: 1px solid #474d57; margin-top: 18px; width: 100%; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
 
         /* Modals Design */
         .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #1c2030; padding: 30px; border-radius: 20px; width: 90%; max-width: 380px; border: 1px solid #2d3346; }
+        .modal-content { background: #161b26; padding: 30px; border-radius: 20px; width: 90%; max-width: 380px; border: 1px solid #2d3346; }
         .modal-content h3 { margin-bottom: 22px; color: #f3ba2f; text-align: center; font-size: 24px; }
-        .modal-content input { width: 100%; padding: 15px; background: #202434; border: 1px solid #474d57; border-radius: 10px; color: white; margin-bottom: 16px; font-size: 16px; outline: none; }
-        .modal-content button { width: 100%; padding: 15px; background: #f3ba2f; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: #1e2329; font-size: 18px; }
+        .modal-content input { width: 100%; padding: 15px; background: #121622; border: 1px solid #474d57; border-radius: 10px; color: white; margin-bottom: 16px; font-size: 16px; outline: none; }
+        .modal-content button { width: 100%; padding: 15px; background: #0ecb81; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; font-size: 18px; }
         .modal-close { text-align: center; margin-top: 15px; color: #848e9c; cursor: pointer; font-size: 16px; }
     </style>
 </head>
@@ -119,48 +124,108 @@
 
     <div id="view-home" class="page-view active">
         <div class="card">
-            <p class="card-title">📈 Withdrawal Rate (BEP20 USDT)</p>
+            <p class="card-title">💸 Withdrawal Rate</p>
             <div class="rate-row">
                 <span>Under 10 USDT</span>
-                <strong style="color: #f3ba2f;">160 ETB</strong>
+                <strong style="color: #ffffff;">160 ETB</strong>
             </div>
             <div class="rate-row">
                 <span>10+ USDT</span>
-                <strong style="color: #f3ba2f;">170 ETB</strong>
+                <strong style="color: #0ecb81;">170 ETB</strong>
             </div>
         </div>
 
         <div class="card">
-            <p class="card-title">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</p>
+            <p class="card-title">💳 Deposit Address (የማስገቢያ አድራሻ)</p>
             
             <div id="before-generate">
-                <p style="font-size: 15px; margin-top: 8px; color: #b7bdc6; line-height: 1.5;">Generate your unique BEP20 USDT deposit address (የራሶን የBEP20 አድራሻ ያውጡ)</p>
-                <button class="btn-yellow" onclick="generateAddress()">Generate BEP20 Address</button>
+                <p style="font-size: 15px; margin-top: 8px; color: #b7bdc6; line-height: 1.5;">Generate your unique LTC deposit address (የራሶን LTC አድራሻ ያግኙ)</p>
+                <button class="btn-green" onclick="generateAddress()">Generate Address (አድራሻ ፍጠር)</button>
             </div>
 
             <div id="after-generate" style="display: none;">
-                <p style="font-size: 15px; margin-top: 8px; color: #b7bdc6;">Your unique BEP20 deposit address is ready:</p>
+                <p style="font-size: 15px; margin-top: 8px; color: #b7bdc6;">Your unique deposit address is ready:</p>
                 <div class="address-box">
                     <code style="color: #f3ba2f; font-size: 16px; font-weight: bold; letter-spacing: 0.5px;">0x71C5A6C289DA574E70A7E7D5D3A2E2CAAE15A6C</code>
-                    <p style="font-size: 14px; color: #848e9c; margin-top: 10px; cursor: pointer;" onclick="alert('አድራሻው ኮፒ ተደርጓል!')">📋 Copy BEP20 Address</p>
+                    <p style="font-size: 14px; color: #848e9c; margin-top: 10px; cursor: pointer;" onclick="alert('አድራሻው ኮፒ ተደርጓል!')">📋 Copy Address</p>
                 </div>
-                <button class="btn-green">Address Generated!</button>
+                <button class="btn-green" style="background:#121622; border:1px solid #0ecb81; color:#0ecb81;">Address Generated!</button>
             </div>
         </div>
 
         <div class="card">
             <p class="card-title">🏆 Top Withdrawals (ታላላቅ ክፍያዎች)</p>
-            <div class="withdrawal-item">
-                <div class="user-info">
-                    <div class="rank-num">1</div>
-                    <div>
-                        <p style="font-weight: bold; font-size: 16px;">Sen*** Hai***</p>
-                        <p style="font-size: 13px; color: #848e9c;">0976***87</p>
+            <p class="sub-txt">Inspiring top earners! (ታላላቅ ክፍያ የተቀበሉ ተጠቃሚዎች)</p>
+            
+            <div class="withdrawal-list-box">
+                <div class="withdrawal-item">
+                    <div class="user-info">
+                        <div class="rank-num">1</div>
+                        <div>
+                            <p style="font-weight: bold;">Sen*** Hai***</p>
+                            <p style="font-size: 12px; color: #848e9c;">0976***87</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="color: #0ecb81; font-weight: bold;">6,142 ETB 🏆</p>
+                        <p style="font-size: 12px; color: #848e9c;">18 Payments</p>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <p style="color: #f3ba2f; font-weight: bold; font-size: 17px;">6,142 ETB 🏆</p>
-                    <p style="font-size: 13px; color: #848e9c;">18 Payments</p>
+
+                <div class="withdrawal-item">
+                    <div class="user-info">
+                        <div class="rank-num" style="color: #b7bdc6; border-color: #b7bdc6;">2</div>
+                        <div>
+                            <p style="font-weight: bold;">Mua*** Abd***</p>
+                            <p style="font-size: 12px; color: #848e9c;">0938***47</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="color: #0ecb81; font-weight: bold;">4,782 ETB 🏆</p>
+                        <p style="font-size: 12px; color: #848e9c;">3 Payments</p>
+                    </div>
+                </div>
+
+                <div class="withdrawal-item">
+                    <div class="user-info">
+                        <div class="rank-num" style="color: #b7bdc6; border-color: #b7bdc6;">3</div>
+                        <div>
+                            <p style="font-weight: bold;">Bam*** ***</p>
+                            <p style="font-size: 12px; color: #848e9c;">0951***37</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="color: #0ecb81; font-weight: bold;">3,745 ETB 🏆</p>
+                        <p style="font-size: 12px; color: #848e9c;">25 Payments</p>
+                    </div>
+                </div>
+
+                <div class="withdrawal-item">
+                    <div class="user-info">
+                        <div class="rank-num" style="color: #b7bdc6; border-color: #b7bdc6;">4</div>
+                        <div>
+                            <p style="font-weight: bold;">fil*** ***</p>
+                            <p style="font-size: 12px; color: #848e9c;">0936***72</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="color: #0ecb81; font-weight: bold;">3,389 ETB 🏆</p>
+                        <p style="font-size: 12px; color: #848e9c;">21 Payments</p>
+                    </div>
+                </div>
+
+                <div class="withdrawal-item">
+                    <div class="user-info">
+                        <div class="rank-num" style="color: #b7bdc6; border-color: #b7bdc6;">5</div>
+                        <div>
+                            <p style="font-weight: bold;">Bon*** Hay***</p>
+                            <p style="font-size: 12px; color: #848e9c;">0933***38</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="color: #0ecb81; font-weight: bold;">3,226 ETB 🏆</p>
+                        <p style="font-size: 12px; color: #848e9c;">14 Payments</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,42 +276,80 @@
     </div>
 
     <div id="view-profile" class="page-view">
-        <div class="card profile-card">
-            <div class="crown-icon">👑</div>
-            <div class="main-title">Forex P2P Squad</div>
-            <div class="sub-title">የእርስዎ ፕሮፋይል</div>
+        <div class="card profile-card" style="text-align: center;">
+            <div style="font-size: 60px; margin-bottom: 10px;">👑</div>
+            <h2 style="color: #f3ba2f; font-size: 26px; margin-bottom: 5px;">Forex P2P Squad</h2>
+            <p style="color: #b7bdc6; font-size: 16px; margin-bottom: 25px;">የእርስዎ ፕሮፋይል</p>
 
-            <div class="avatar-box">
-                <span style="font-size: 45px; color: #848e9c;">👤</span>
-                <span id="profile-card-name" class="u-name">---</span>
-                <span style="color: #848e9c; font-size: 13px; margin-top: 3px;">የተከበረ የቡድናችን አባል</span>
+            <div style="background: #1c2030; border: 1px solid #2d3346; padding: 20px; border-radius: 16px; text-align: left; display: flex; flex-direction: column; gap: 15px;">
+                <p style="font-size: 17px;">📌 <strong>የአባልነት ስም፦</strong> <span id="info-name">Semir</span></p>
+                <p style="font-size: 17px;">📞 <strong>ስልክ ቁጥር፦</strong> <span id="info-phone">0997370734</span></p>
+                <p style="font-size: 17px;">💼 <strong>የአካውንት ሁኔታ፦</strong> <span style="color: #0ecb81; font-weight: bold;">Active ✅</span></p>
             </div>
 
-            <div class="info-list">
-                <div class="info-item">
-                    <span>📌</span> <strong>የአባልነት ስም፦</strong> <span id="info-name">---</span>
-                </div>
-                <div class="info-item">
-                    <span>📞</span> <strong>ስልክ ቁጥር፦</strong> <span id="info-phone">---</span>
-                </div>
-                <div class="info-item">
-                    <span>💼</span> <strong>የአካውንት ሁኔታ፦</strong> <span style="color: #0ecb81; font-weight: bold;">Active ✅</span>
-                </div>
-            </div>
-
-            <button class="btn-logout" onclick="handleLogout()">ውጣ (Logout)</button>
+            <button class="btn-green" style="background: #2c3142; color: #f6465d; margin-top: 25px;" onclick="handleLogout()">ውጣ (Logout)</button>
             <button class="btn-back" onclick="switchTab('home')">⬅️ ወደ ሆም ተመለስ</button>
         </div>
     </div>
 
     <div id="view-guide" class="page-view">
         <div class="card">
-            <h3 style="color: #f3ba2f; margin-bottom: 18px; font-size: 20px;">📖 መመሪያና መረጃ</h3>
-            <p style="color: #b7bdc6; line-height: 1.7; font-size: 16px;">
-                እንኳን ወደ Forex P2P Squad በደህና መጡ! ይህ መተግበሪያ በታማኝነት እና በፍጥነት የ USDT ግዢና ሽያጭ ለመፈጸም ይረዳዎታል።<br><br>
-                1. <strong>USDT ለመግዛት፦</strong> P2P Trade ውስጥ በመግባት Buy የሚለውን ይጫኑ።<br>
-                2. <strong>USDT ለመሸጥ፦</strong> Sell የሚለውን በመጫን የባንክ አካውንትዎን በትክክል ይሙሉ።
-            </p>
+            <p class="card-title">📖 How to Withdraw</p>
+            <div class="lang-switch">
+                <button class="btn-lang" style="border-color: #0ecb81; color: #0ecb81;">🇪🇹 አማርኛ</button>
+                <button class="btn-lang">🇺🇸 English</button>
+            </div>
+            <p style="color: #b7bdc6; font-size: 14px; margin-bottom: 20px;">ከ Gmail Farm USDT በምን መልኩ Withdraw ለማድረግ እነዚህን Steps ይከተሉ 👇</p>
+            
+            <div class="guide-container">
+                <div class="guide-step">
+                    <div class="step-left"><div class="step-number">1</div><div class="step-line"></div></div>
+                    <div class="step-content">
+                        <div class="step-title">⏳ Balance ይጠብቁ</div>
+                        <div class="step-desc">Gmail Farm ላይ Hold ወደ Balance እስኪገባ ይጠብቁ</div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-left"><div class="step-number">2</div><div class="step-line"></div></div>
+                    <div class="step-content">
+                        <div class="step-title">🔐 Login / Register ያድርጉ</div>
+                        <div class="step-desc">በስልክ ቁጥርዎ Login ያድርጉ። አካውንት ከሌለዎት Register ያድርጉ።</div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-left"><div class="step-number">3</div><div class="step-line"></div></div>
+                    <div class="step-content">
+                        <div class="step-title">💳 Payment Method ያስገቡ</div>
+                        <div class="step-desc">My Withdrawals ላይ የክፍያ ዘዴ ያክሉ — Telebirr ወይም CBE ባንክ።</div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-left"><div class="step-number">4</div><div class="step-line"></div></div>
+                    <div class="step-content">
+                        <div class="step-title">📋 Address Generate ያድርጉ</div>
+                        <div class="step-desc">Home ላይ Generate Address የሚለውን በመንካት የራስዎን አድራሻ ያግኙና ኮፒ ያድርጉ።</div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-left"><div class="step-number">5</div><div class="step-line"></div></div>
+                    <div class="step-content">
+                        <div class="step-title">🚀 Gmail Farm ላይ Withdraw ያድርጉ</div>
+                        <div class="step-desc">Gmail Farm Bot -> Balance -> Payout -> አድራሻውን Paste በማድረግ ይላኩ።</div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-left"><div class="step-number">6</div><div class="step-line"></div></div>
+                    <div class="step-content">
+                        <div class="step-title">✅ Status ይፈትሹ</div>
+                        <div class="step-desc">'Payout Has Been Made' ከተባለ በኋላ ወደዚህ ተመልሰው Check Status ያድርጉ።</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -273,7 +376,6 @@
     </div>
 </div>
 
-
 <script>
     let currentOrderType = 'BUY';
 
@@ -294,7 +396,7 @@
     function generateAddress() {
         const checkUser = localStorage.getItem('currentUser');
         if (!checkUser) {
-            alert('❌ እባክዎ መጀመሪያ Login ያድርጉ ወይም ይመዝገቡ!');
+            alert('❌ እባክዎ መጀመሪያ Login ያድርጉ!');
             openModal('login-modal');
             return;
         }
@@ -314,12 +416,8 @@
         const name = document.getElementById('reg-name').value.trim();
         const phone = document.getElementById('reg-phone').value.trim();
         const pass = document.getElementById('reg-pass').value.trim();
-        
         if (!name || !phone || !pass) { alert('እባክዎ ሁሉንም ይሙሉ!'); return; }
-        
-        const userData = { name: name, phone: phone, pass: pass };
-        localStorage.setItem('local_user_' + phone, JSON.stringify(userData));
-        
+        localStorage.setItem('local_user_' + phone, JSON.stringify({ name: name, phone: phone, pass: pass }));
         loginUserSuccess(name, phone);
         closeModal('register-modal');
     }
@@ -327,31 +425,21 @@
     function processLogin() {
         const phone = document.getElementById('login-phone').value.trim();
         const pass = document.getElementById('login-pass').value.trim();
-        
-        if (!phone || !pass) { alert('እባክዎ ስልክ እና ፓስወርድ ያስገቡ!'); return; }
-        
+        if (!phone || !pass) { alert('እባክዎ ይሙሉ!'); return; }
         const localData = localStorage.getItem('local_user_' + phone);
         if (localData) {
             const u = JSON.parse(localData);
-            if (u.pass === pass) {
-                loginUserSuccess(u.name, u.phone);
-                closeModal('login-modal');
-                return;
-            }
+            if (u.pass === pass) { loginUserSuccess(u.name, u.phone); closeModal('login-modal'); return; }
         }
-        
-        loginUserSuccess("✍️ " + phone.substring(0,4), phone);
+        loginUserSuccess("👤 MR CRYPTO", phone);
         closeModal('login-modal');
     }
 
     function loginUserSuccess(name, phone) {
         localStorage.setItem('currentUser', JSON.stringify({ name: name, phone: phone }));
-        
         document.getElementById('auth-guest-view').style.display = 'none';
         document.getElementById('auth-user-view').style.display = 'flex';
         document.getElementById('display-header-name').innerText = name;
-
-        document.getElementById('profile-card-name').innerText = name;
         document.getElementById('info-name').innerText = name;
         document.getElementById('info-phone').innerText = phone;
     }
@@ -366,38 +454,26 @@
     }
 
     function openOrderForm(type) {
-        const checkUser = localStorage.getItem('currentUser');
-        if (!checkUser) {
-            alert('❌ ይህንን ለማድረግ እባክዎ መጀመሪያ Login ያድርጉ!');
-            openModal('login-modal');
-            return;
-        }
-
         currentOrderType = type;
         document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
         document.getElementById('view-order-form').classList.add('active');
-        
         const titleElement = document.getElementById('order-form-title');
         const bankGroup = document.getElementById('bank-input-group');
-        const btnSubmit = document.getElementById('btn-submit-order');
-
         if (type === 'BUY') {
             titleElement.innerText = "🟢 Buy USDT";
             titleElement.style.color = "#0ecb81";
             bankGroup.style.display = "none";
-            btnSubmit.style.background = "#0ecb81";
         } else {
             titleElement.innerText = "🔴 Sell USDT";
             titleElement.style.color = "#f6465d";
             bankGroup.style.display = "block";
-            btnSubmit.style.background = "#f6465d";
         }
     }
 
     function submitOrder() {
         const amount = document.getElementById('order-amount').value;
         if (!amount) { alert('እባክዎ መጠን ያስገቡ!'); return; }
-        alert('✅ የ' + currentOrderType + ' ትዕዛዝዎ በተሳካ ሁኔታ ለአድሚኑ ተልኳል!');
+        alert('✅ የ' + currentOrderType + ' ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል!');
         switchTab('trade');
     }
 </script>
