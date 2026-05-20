@@ -1,130 +1,402 @@
-import telebot
-from telebot import types
-import os
-import requests
-
-# 1. መረጃዎችን ከ Railway Variables መሳብ
-TOKEN = os.getenv('BOT_TOKEN')
-ADMIN_ID = os.getenv('ADMIN_ID')  # የአንተ የቴሌግራም ID
-CHANNEL_USERNAME = os.getenv('CHANNEL_USERNAME')
-
-bot = telebot.TeleBot(TOKEN)
-
-BUY_RATE = 185.0   
-SELL_RATE = 175.0  
-user_sessions = {}
-
-# ጊዜያዊ የምዝገባ ጥያቄዎችን መያዣ (በእውነተኛ ስራ ላይ በዳታቤዝ ቢተካ ይመረጣል)
-pending_registrations = {}
-
-def is_subscribed(user_id):
-    try:
-        status = bot.get_chat_member(CHANNEL_USERNAME, user_id).status
-        return status in ['member', 'administrator', 'creator']
-    except:
-        return False
-
-@bot.message_handler(commands=['start'])
-def start(message):
-    if not is_subscribed(message.from_user.id):
-        markup = types.InlineKeyboardMarkup()
-        btn_join = types.InlineKeyboardButton("🔥 JOIN CHANNEL 🔥", url=f"https://t.me/{CHANNEL_USERNAME[1:]}")
-        btn_check = types.InlineKeyboardButton("🔄 አረጋግጥ", callback_data="check_sub")
-        markup.add(btn_join)
-        markup.add(btn_check)
-        bot.send_message(message.chat.id, f"እንኳን መጡ! ቦቱን ለመጠቀም መጀመሪያ ቻናላችንን ይቀላቀሉ፦ {CHANNEL_USERNAME}", reply_markup=markup)
-        return
-    
-    send_main_menu(message.chat.id)
-
-def send_main_menu(chat_id):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    btn1 = types.KeyboardButton("💸 USDT መግዛት/መሸጥ (P2P)")
-    btn2 = types.KeyboardButton("📣 ማስታወቂያ ለማሰራት")
-    btn3 = types.KeyboardButton("🔱 Tutorial & Info")
-    btn4 = types.KeyboardButton("🌟 Donate (Stars/TON)")
-    btn5 = types.KeyboardButton("🙋‍♂️ ጥያቄና ሀሳብ")
-    markup.add(btn1)
-    markup.add(btn2, btn3)
-    markup.add(btn4, btn5)
-    bot.send_message(chat_id, "እንኳን ወደ **Forex p2p squad** በደህና መጡ! 🚀", reply_markup=markup, parse_mode="Markdown")
-
-@bot.message_handler(func=lambda message: True)
-def handle_messages(message):
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-    text = message.text
-
-    if "USDT" in text and "P2P" in text:
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-        btn_buy = types.KeyboardButton("🟢 USDT መግዛት እፈልጋለሁ")
-        btn_sell = types.KeyboardButton("🔴 USDT መሸጥ እፈልጋለሁ")
-        btn_back = types.KeyboardButton("🔙 ወደ ዋናው ማውጫ")
-        markup.add(btn_buy, btn_sell)
-        markup.add(btn_back)
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex P2P Squad</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #131722; color: #ffffff; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 420px; background: #1c2030; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         
-        rate_text = f"📊 **የአሁኑ የUSDT የገበያ ዋጋ፦**\n\n🟢 መግዣ፦ `{BUY_RATE} ETB`\n🔴 መሸጫ፦ `{SELL_RATE} ETB`"
-        bot.send_message(chat_id, rate_text, reply_markup=markup, parse_mode="Markdown")
-
-    elif "መግዛት እፈልጋለሁ" in text or "መሸጥ እፈልጋለሁ" in text:
-        action = "BUY" if "መግዛት" in text else "SELL"
-        user_sessions[user_id] = {"action": action}
-        msg = bot.send_message(chat_id, "🔢 እባክዎ የሚፈልጉትን የUSDT መጠን በቁጥር ብቻ ያስገቡ፦")
-        bot.register_next_step_handler(msg, calculate_p2p)
+        /* 🔝 TOP HEADER AREA */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand-logo { width: 40px; height: 40px; background: #f3ba2f; border-radius: 8px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
+        .brand-title h2 { font-size: 18px; color: white; }
+        .brand-title p { font-size: 12px; color: #848e9c; }
         
-    elif "ዋናው ማውጫ" in text or "🔙" in text:
-        send_main_menu(chat_id)
-
-def calculate_p2p(message):
-    # (የድሮው የፒቱፒ ስሌት ኮድህ እዚህ ይቀጥላል...)
-    pass
-
-# 🔥 አዲስ፦ ከቪርሰል ዌብሳይት የሚመጣውን የምዝገባ ጥያቄ ለመቀበል (Webhook/API ወይም እራስህ የምትልከው ከሆነ)
-# ይህ አሰራር ለአድሚኑ ማጽደቂያ በተን ይፈጥራል
-def forward_registration_to_admin(user_tg_id, full_name, phone_number):
-    pending_registrations[str(user_tg_id)] = {
-        "name": full_name,
-        "phone": phone_number
-    }
-    
-    markup = types.InlineKeyboardMarkup()
-    btn_approve = types.InlineKeyboardButton("✅ Approve (ፍቀድ)", callback_data=f"reg_approve_{user_tg_id}")
-    btn_reject = types.InlineKeyboardButton("❌ Reject (ከልክል)", callback_data=f"reg_reject_{user_tg_id}")
-    markup.add(btn_approve, btn_reject)
-    
-    admin_msg = (
-        f"📝 **አዲስ የዌብሳይት ምዝገባ ጥያቄ!**\n\n"
-        f"👤 ስም፦ {full_name}\n"
-        f"📞 ስልክ፦ {phone_number}\n"
-        f"🆔 Telegram ID: `{user_tg_id}`"
-    )
-    bot.send_message(ADMIN_ID, admin_msg, reply_markup=markup, parse_mode="Markdown")
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_query(call):
-    if call.data.startswith("reg_approve_"):
-        user_tg_id = call.data.split("_")[2]
-        user_info = pending_registrations.get(user_tg_id)
+        /* Auth Buttons Box */
+        .auth-buttons { display: flex; flex-direction: column; gap: 5px; }
+        .btn-login { background: #f3ba2f; color: #1e2329; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-register { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
         
-        if user_info:
-            # ለአድሚኑ ማረጋገጫ መስጠት
-            bot.edit_message_text(f"✅ የ {user_info['name']} ምዝገባ በድል ጸድቋል!", call.message.chat.id, call.message.message_id)
-            # ለተጠቃሚው መልእክት መላክ
-            try:
-                bot.send_message(user_tg_id, "🎉 እንኳን ደስ አለዎት! የዌብሳይት ምዝገባዎ በአድሚን ተቀባይነት አግኝቷል። አሁን ገብተው መጠቀም ይችላሉ።")
-            except:
-                pass
-            # እዚህ ጋር ወደ ዌብሳይትህ ዳታቤዝ 'Status: Approved' ብሎ የሚቀይር የ API ጥሪ ማከል ትችላለህ
+        /* User Profile Tag */
+        .user-logged-in { display: none; align-items: center; gap: 8px; background: #25293a; padding: 8px 12px; border-radius: 20px; border: 1px solid #2a2e3f; cursor: pointer; }
+        .user-name { color: #f3ba2f; font-weight: bold; font-size: 14px; }
+
+        /* 🗂️ NAVIGATION TABS */
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab { flex: 1; background: #25293a; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #2a2e3f; cursor: pointer; font-size: 14px; color: #b7bdc6; }
+        .tab.active { border-color: #f3ba2f; color: white; background: #1e2232; }
+
+        /* Page Views Control */
+        .page-view { display: none; }
+        .page-view.active { display: block; }
+
+        /* Content Cards */
+        .card { background: #171a26; border: 1px solid #25293a; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .rate-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
+        .address-box { background: #232838; border: 1px solid #f3ba2f; border-style: dashed; padding: 15px; border-radius: 8px; text-align: center; margin-top: 10px; }
+        .btn-green { width: 100%; background: #0ecb81; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .btn-yellow { width: 100%; background: linear-gradient(180deg, #f3ba2f 0%, #dca41b 100%); color: #1e2329; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        
+        /* Top Withdrawals List */
+        .withdrawal-item { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 14px; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .rank-num { width: 24px; height: 24px; border: 1px solid #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #f3ba2f; }
+
+        /* P2P Trade Buttons */
+        .trade-container { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
+        .btn-trade { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 8px; font-size: 18px; font-weight: bold; color: white; border: 2px solid #343a40; background: #171a26; transition: 0.2s; cursor: pointer; }
+        .btn-trade.buy { border-color: #0ecb81; }
+        .btn-trade.sell { border-color: #f6465d; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.green { background-color: #0ecb81; box-shadow: 0 0 8px #0ecb81; }
+        .dot.red { background-color: #f6465d; box-shadow: 0 0 8px #f6465d; }
+
+        /* Profile Details Screen */
+        .profile-card { text-align: center; padding: 20px 10px; }
+        .crown-icon { font-size: 50px; margin-bottom: 5px; }
+        .main-title { color: #f3ba2f; font-size: 22px; margin-bottom: 15px; font-weight: bold; }
+        .sub-title { color: #b7bdc6; font-size: 16px; margin-bottom: 20px; }
+        .avatar-box { background: #25293a; width: 100px; height: 100px; border-radius: 12px; margin: 0 auto 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #2a2e3f; }
+        .info-list { text-align: left; background: #171a26; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #25293a; }
+        .info-item { margin-bottom: 12px; font-size: 15px; color: #b7bdc6; display: flex; align-items: center; gap: 8px; }
+        .btn-logout { width: 100%; padding: 14px; background: #2b3139; color: #f6465d; border: 1px solid #474d57; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+        /* Form Controls */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; color: #848e9c; font-size: 14px; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 8px; color: white; font-size: 16px; outline: none; }
+        .input-group input:focus { border-color: #f3ba2f; }
+        .btn-back { background: #2b3139; color: #b7bdc6; border: 1px solid #474d57; margin-top: 15px; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* Modals Design */
+        .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #1c2030; padding: 25px; border-radius: 12px; width: 90%; max-width: 360px; border: 1px solid #2a2e3f; }
+        .modal-content h3 { margin-bottom: 15px; color: #f3ba2f; text-align: center; }
+        .modal-content input { width: 100%; padding: 12px; background: #2b3139; border: 1px solid #474d57; border-radius: 6px; color: white; margin-bottom: 12px; outline: none; }
+        .modal-content button { width: 100%; padding: 12px; background: #f3ba2f; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #1e2329; }
+        .modal-close { text-align: center; margin-top: 10px; color: #848e9c; cursor: pointer; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div class="header-top">
+        <div class="brand">
+            <div class="brand-logo">👑</div>
+            <div class="brand-title">
+                <h2>Forex P2P</h2>
+                <p>Squad</p>
+            </div>
+        </div>
+        
+        <div id="auth-guest-view" class="auth-buttons">
+            <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
+            <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
+        </div>
+
+        <div id="auth-user-view" class="user-logged-in" onclick="switchTab('profile')">
+            <span>👤 <span id="display-header-name" class="user-name">---</span></span>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <div id="tab-home" class="tab active" onclick="switchTab('home')">🏠 Home</div>
+        <div id="tab-trade" class="tab" onclick="switchTab('trade')">🔄 P2P Trade</div>
+        <div id="tab-guide" class="tab" onclick="switchTab('guide')">📖 Guide</div>
+    </div>
+
+    <div id="view-home" class="page-view active">
+        <div class="card">
+            <p style="color: #848e9c; font-size: 14px;">📈 Withdrawal Rate (BEP20 USDT)</p>
+            <div class="rate-row">
+                <span>Under 10 USDT</span>
+                <strong style="color: #f3ba2f;">170 ETB</strong>
+            </div>
+            <div class="rate-row">
+                <span>10+ USDT</span>
+                <strong style="color: #f3ba2f;">175 ETB</strong>
+            </div>
+        </div>
+
+        <div class="card">
+            <p style="color: #848e9c; font-size: 14px;">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</p>
             
-    elif call.data.startswith("reg_reject_"):
-        user_tg_id = call.data.split("_")[2]
-        user_info = pending_registrations.get(user_tg_id)
-        if user_info:
-            bot.edit_message_text(f"❌ የ {user_info['name']} ምዝገባ ውድቅ ተደርጓል።", call.message.chat.id, call.message.message_id)
-            try:
-                bot.send_message(user_tg_id, "❌ ይቅርታ፣ የዌብሳይት ምዝገባ ጥያቄዎ በአድሚን ውድቅ ተደርጓል።")
-            except:
-                pass
+            <div id="before-generate">
+                <p style="font-size: 13px; margin-top: 5px; color: #b7bdc6;">Generate your unique BEP20 USDT deposit address (የራሶን የBEP20 አድራሻ ያውጡ)</p>
+                <button class="btn-yellow" onclick="generateAddress()">Generate BEP20 Address</button>
+            </div>
 
-if __name__ == "__main__":
-    bot.infinity_polling()
+            <div id="after-generate" style="display: none;">
+                <p style="font-size: 13px; margin-top: 5px; color: #b7bdc6;">Your unique BEP20 deposit address is ready:</p>
+                <div class="address-box">
+                    <code style="color: #f3ba2f; font-size: 14px;">0x71C5A6C289DA574E70A7E7D5D3A2E2CAAE15A6C</code>
+                    <p style="font-size: 12px; color: #848e9c; margin-top: 5px; cursor: pointer;" onclick="alert('አድራሻው ኮፒ ተደርጓል!')">📋 Copy BEP20 Address</p>
+                </div>
+                <button class="btn-green">Address Generated!</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <p style="color: #848e9c; font-size: 14px;">🏆 Top Withdrawals (ታላላቅ ክፍያዎች)</p>
+            <div class="withdrawal-item">
+                <div class="user-info">
+                    <div class="rank-num">1</div>
+                    <div>
+                        <p style="font-weight: bold;">Sen*** Hai***</p>
+                        <p style="font-size: 11px; color: #848e9c;">0976***87</p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <p style="color: #f3ba2f; font-weight: bold;">6,142 ETB 🏆</p>
+                    <p style="font-size: 11px; color: #848e9c;">18 Payments</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-trade" class="page-view">
+        <div class="card" style="text-align: center; padding: 25px 15px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">👑</div>
+            <h3 style="color: #f3ba2f; margin-bottom: 20px;">Forex P2P Squad</h3>
+            
+            <div class="trade-container">
+                <button class="btn-trade buy" onclick="openOrderForm('BUY')">
+                    <div class="dot green"></div> Buy USDT
+                </button>
+                <button class="btn-trade sell" onclick="openOrderForm('SELL')">
+                    <div class="dot red"></div> Sell USDT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-order-form" class="page-view">
+        <div class="card">
+            <h3 id="order-form-title" style="margin-bottom: 20px; text-align: center;">---</h3>
+            
+            <div class="input-group">
+                <label>የሚፈልጉት የዶላር መጠን ($)</label>
+                <input type="number" id="order-amount" placeholder="ለምሳሌ፦ 50">
+            </div>
+            
+            <div id="bank-input-group" class="input-group">
+                <label>የባንክ አካውንት ቁጥር</label>
+                <input type="text" id="order-bank-acc" placeholder="ገንዘብ የሚቀበሉበትን አካውንት ያስገቡ">
+            </div>
+
+            <div class="input-group">
+                <label>የመክፈያ/የመቀበያ ዘዴ</label>
+                <select id="order-method">
+                    <option>CBE (የኢትዮጵያ ንግድ ባንክ)</option>
+                    <option>Telebirr (ቴሌብር)</option>
+                    <option>BOA (አቢሲኒያ ባንክ)</option>
+                </select>
+            </div>
+
+            <button id="btn-submit-order" class="btn-green" onclick="submitOrder()">ትዕዛዝ ላክ (Submit)</button>
+            <button class="btn-back" onclick="switchTab('trade')">⬅️ ተመለስ</button>
+        </div>
+    </div>
+
+    <div id="view-profile" class="page-view">
+        <div class="card profile-card">
+            <div class="crown-icon">👑</div>
+            <div class="main-title">Forex P2P Squad</div>
+            <div class="sub-title">የእርስዎ ፕሮፋይል</div>
+
+            <div class="avatar-box">
+                <span style="font-size: 35px; color: #848e9c;">👤</span>
+                <span id="profile-card-name" class="u-name">---</span>
+                <span class="u-role">የተከበረ የቡድናችን አባል</span>
+            </div>
+
+            <div class="info-list">
+                <div class="info-item">
+                    <span>📌</span> <strong>የአባልነት ስም፦</strong> <span id="info-name">---</span>
+                </div>
+                <div class="info-item">
+                    <span>📞</span> <strong>ስልክ ቁጥር፦</strong> <span id="info-phone">---</span>
+                </div>
+                <div class="info-item">
+                    <span>💼</span> <strong>የአካውንት ሁኔታ፦</strong> <span style="color: #0ecb81; font-weight: bold;">Active ✅</span>
+                </div>
+            </div>
+
+            <button class="btn-logout" onclick="handleLogout()">ውጣ (Logout)</button>
+            <button class="btn-back" onclick="switchTab('home')">⬅️ ወደ ሆም ተመለስ</button>
+        </div>
+    </div>
+
+    <div id="view-guide" class="page-view">
+        <div class="card">
+            <h3 style="color: #f3ba2f; margin-bottom: 15px;">📖 መመሪያና መረጃ</h3>
+            <p style="color: #b7bdc6; line-height: 1.6; font-size: 14px;">
+                እንኳን ወደ Forex P2P Squad በደህና መጡ! ይህ መተግበሪያ በታማኝነት እና በፍጥነት የ USDT ግዢና ሽያጭ ለመፈጸም ይረዳዎታል።<br><br>
+                1. <strong>USDT ለመግዛት፦</strong> P2P Trade ውስጥ በመግባት Buy የሚለውን ይጫኑ።<br>
+                2. <strong>USDT ለመሸጥ፦</strong> Sell የሚለውን በመጫን የባንክ አካውንትዎን በትክክል ይሙሉ።
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<div id="login-modal" class="auth-modal">
+    <div class="modal-content">
+        <h3>Login (ግባ)</h3>
+        <input type="tel" id="login-phone" placeholder="ስልክ ቁጥር">
+        <input type="password" id="login-pass" placeholder="የይለፍ ቃል">
+        <button onclick="processLogin()">ግባ</button>
+        <div class="modal-close" onclick="closeModal('login-modal')">❌ ዝጋ</div>
+    </div>
+</div>
+
+<div id="register-modal" class="auth-modal">
+    <div class="modal-content">
+        <h3>Register (ተመዝገብ)</h3>
+        <input type="text" id="reg-name" placeholder="ሙሉ ስም">
+        <input type="tel" id="reg-phone" placeholder="ስልክ ቁጥር">
+        <input type="password" id="reg-pass" placeholder="ፓስወርድ">
+        <button onclick="processRegister()">ተመዝገብ</button>
+        <div class="modal-close" onclick="closeModal('register-modal')">❌ ዝጋ</div>
+    </div>
+</div>
+
+
+<script>
+    let currentOrderType = 'BUY';
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
+        document.querySelectorAll('.nav-tabs .tab').forEach(t => t.classList.remove('active'));
+
+        const targetView = document.getElementById('view-' + tabName);
+        if (targetView) targetView.classList.add('active');
+
+        const targetTab = document.getElementById('tab-' + tabName);
+        if (targetTab) targetTab.classList.add('active');
+    }
+
+    // 🔄 አድራሻ ለማውጣት (Generate Address)
+    function generateAddress() {
+        const checkUser = localStorage.getItem('currentUser');
+        if (!checkUser) {
+            alert('❌ እባክዎ መጀመሪያ Login ያድርጉ ወይም ይመዝገቡ!');
+            openModal('login-modal');
+            return;
+        }
+        document.getElementById('before-generate').style.display = 'none';
+        document.getElementById('after-generate').style.display = 'block';
+    }
+
+    // ገጹ ሲከፈት የድሮ አካውንት ካለ ማስታወስ
+    window.onload = function() {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            const u = JSON.parse(savedUser);
+            loginUserSuccess(u.name, u.phone);
+        }
+    };
+
+    function processRegister() {
+        const name = document.getElementById('reg-name').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const pass = document.getElementById('reg-pass').value.trim();
+        
+        if (!name || !phone || !pass) { alert('እባክዎ ሁሉንም ይሙሉ!'); return; }
+        
+        const userData = { name: name, phone: phone, pass: pass };
+        localStorage.setItem('local_user_' + phone, JSON.stringify(userData));
+        
+        loginUserSuccess(name, phone);
+        closeModal('register-modal');
+    }
+
+    function processLogin() {
+        const phone = document.getElementById('login-phone').value.trim();
+        const pass = document.getElementById('login-pass').value.trim();
+        
+        if (!phone || !pass) { alert('እባክዎ ስልክ እና ፓስወርድ ያስገቡ!'); return; }
+        
+        const localData = localStorage.getItem('local_user_' + phone);
+        if (localData) {
+            const u = JSON.parse(localData);
+            if (u.pass === pass) {
+                loginUserSuccess(u.name, u.phone);
+                closeModal('login-modal');
+                return;
+            }
+        }
+        
+        // ከሌለ በጊዜያዊ ስም ያስገባዋል
+        loginUserSuccess("User_" + phone.substring(0,4), phone);
+        closeModal('login-modal');
+    }
+
+    function loginUserSuccess(name, phone) {
+        localStorage.setItem('currentUser', JSON.stringify({ name: name, phone: phone }));
+        
+        document.getElementById('auth-guest-view').style.display = 'none';
+        document.getElementById('auth-user-view').style.display = 'flex';
+        document.getElementById('display-header-name').innerText = name;
+
+        document.getElementById('profile-card-name').innerText = name;
+        document.getElementById('info-name').innerText = name;
+        document.getElementById('info-phone').innerText = phone;
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('currentUser');
+        document.getElementById('auth-user-view').style.display = 'none';
+        document.getElementById('auth-guest-view').style.display = 'flex';
+        document.getElementById('before-generate').style.display = 'block';
+        document.getElementById('after-generate').style.display = 'none';
+        switchTab('home');
+    }
+
+    function openOrderForm(type) {
+        const checkUser = localStorage.getItem('currentUser');
+        if (!checkUser) {
+            alert('❌ ይህንን ለማድረግ እባክዎ መጀመሪያ Login ያድርጉ!');
+            openModal('login-modal');
+            return;
+        }
+
+        currentOrderType = type;
+        document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
+        document.getElementById('view-order-form').classList.add('active');
+        
+        const titleElement = document.getElementById('order-form-title');
+        const bankGroup = document.getElementById('bank-input-group');
+        const btnSubmit = document.getElementById('btn-submit-order');
+
+        if (type === 'BUY') {
+            titleElement.innerText = "🟢 Buy USDT";
+            titleElement.style.color = "#0ecb81";
+            bankGroup.style.display = "none";
+            btnSubmit.style.background = "#0ecb81";
+        } else {
+            titleElement.innerText = "🔴 Sell USDT";
+            titleElement.style.color = "#f6465d";
+            bankGroup.style.display = "block";
+            btnSubmit.style.background = "#f6465d";
+        }
+    }
+
+    function submitOrder() {
+        const amount = document.getElementById('order-amount').value;
+        if (!amount) { alert('እባክዎ መጠን ያስገቡ!'); return; }
+        alert('✅ የ' + currentOrderType + ' ትዕዛዝዎ በተሳካ ሁኔታ ለአድሚኑ ተልኳል!');
+        switchTab('trade');
+    }
+</script>
+
+</body>
+</html>
