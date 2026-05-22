@@ -140,11 +140,6 @@
                             <option value="cbe">CBE (የኢትዮጵያ ንግድ ባንክ)</option>
                         </select>
                     </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Your Phone Number (የራስዎ ስልክ ቁጥር)</label>
-                        <input type="tel" id="user-phone" placeholder="09..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
-                    </div>
 
                     <div style="margin-bottom: 15px;">
                         <label id="dynamic-label" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Your Binance Pay ID or Email</label>
@@ -196,7 +191,7 @@
 
         <footer class="footer">
             <span>Forex P2P Squad © 2026</span>
-            <span>v3.4</span>
+            <span>v3.5</span>
         </footer>
     </div>
 
@@ -254,7 +249,6 @@
         window.onload = function() {
             const savedUser = localStorage.getItem('currentUserPhone');
             if (savedUser) { isLoggedIn = true; loggedInUserPhone = savedUser; updateAuthHeader(); }
-            // መጀመሪያ ገጹ ሲከፈት በዲፎልት buy ስለሆነ ሳጥኑን ደብቀን እንጀምር
             document.getElementById('payment-method-row').style.display = 'none';
         };
 
@@ -322,7 +316,6 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // ⚡ የተቀየረ፡ Buy ሲመረጥ የክፍያ መንገድ (Payment Method) ምርጫ ሳጥኑን ይደብቃል
         function setTradeType(type) {
             currentTradeType = type;
             const buyBtn = document.getElementById('trade-buy-btn');
@@ -350,7 +343,7 @@
                 buyAccountsBox.style.display = "block";
                 sellAccountsBox.style.display = "none";
                 platformRow.style.display = "block";
-                paymentMethodRow.style.display = "none"; // ⚡ Buy ሲሆን ይጠፋል
+                paymentMethodRow.style.display = "none";
                 screenshotTitle.innerText = "Upload Payment Receipt (የባንክ ክፍያ ስክሪንሻት) *";
                 screenshotTitle.style.color = "#22c55e";
                 updateDynamicPlaceholder();
@@ -362,7 +355,7 @@
                 buyAccountsBox.style.display = "none";
                 sellAccountsBox.style.display = "block";
                 platformRow.style.display = "none";
-                paymentMethodRow.style.display = "block"; // ⚡ Sell ሲሆን መልሶ ይታያል
+                paymentMethodRow.style.display = "block";
                 screenshotTitle.innerText = "Upload USDT Transfer Screenshot (ለእኛ የላክህበት ማረጋገጫ) *";
                 screenshotTitle.style.color = "#ef4444";
                 dynamicLabel.innerText = "Your Account Details (ብር የምንልክልህ የባንክ/ቴሌብር ስም እና ቁጥር)";
@@ -386,11 +379,11 @@
 
         function handleTradeSubmit(event) {
             event.preventDefault();
+            // ⚡ ተጠቃሚው ካልገባ መጀመሪያ እንዲገባ መጠየቅ
             if(!isLoggedIn) { showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); openModal('login-modal'); return; }
 
             const amount = document.getElementById('trade-amount').value;
             const method = document.getElementById('payment-method').value;
-            const phone = document.getElementById('user-phone').value;
             const dynamicValue = document.getElementById('dynamic-input').value;
             const platform = document.getElementById('crypto-platform').value;
             const tradeFile = document.getElementById('trade-file').files[0];
@@ -404,17 +397,16 @@
             globalCurrentOrderId = orderId;
 
             let targetDestination = (currentTradeType === 'buy') ? `Platform: ${platform.toUpperCase()} (${dynamicValue})` : `User Bank Account: ${dynamicValue}`;
-            
-            // ⚡ የክፍያ መንገድ መግለጫ (ለBuy ከሆነ ከስክሪንሻት ይታያል፣ ለSell ከሆነ ደንበኛው የመረጠው ነው)
             let paymentRouteText = (currentTradeType === 'buy') ? "ስክሪንሻቱን ይመልከቱ" : method.toUpperCase();
 
+            // ⚡ የተስተካከለ፡ አሁን 'loggedInUserPhone' በቀጥታ ከሲስተሙ ተወስዶ ይላካል
             const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
                         `🆔 *Order ID:* \`${orderId}\`\n` +
                         `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
                         `💰 *የዶላር መጠን:* ${amount} USDT\n` +
                         `💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n` +
                         `🏦 *ክፍያ መንገድ:* ${paymentRouteText}\n` +
-                        `📞 *የደንበኛ ስልክ:* ${phone}\n` +
+                        `📞 *የደንበኛ ስልክ:* ${loggedInUserPhone}\n` +
                         `🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
 
             sendPhotoToTelegram(tradeFile, msg, orderId, currentTradeType, amount, paymentRouteText, targetDestination);
