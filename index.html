@@ -88,8 +88,8 @@
             <section class="card">
                 <div class="card-title">🔄 P2P Trade Center</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <button id="trade-buy-btn" onclick="setTradeType('buy')" style="flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background-color: #22c55e; color: white; cursor: pointer;">Buy (ግዛ)</button>
-                    <button id="trade-sell-btn" onclick="setTradeType('sell')" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-weight: bold; background-color: #1a202e; color: #a0aec0; cursor: pointer;">Sell (ሽጥ)</button>
+                    <button type="button" id="trade-buy-btn" onclick="setTradeType('buy')" style="flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background-color: #22c55e; color: white; cursor: pointer;">Buy (ግዛ)</button>
+                    <button type="button" id="trade-sell-btn" onclick="setTradeType('sell')" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-weight: bold; background-color: #1a202e; color: #a0aec0; cursor: pointer;">Sell (ሽጥ)</button>
                 </div>
 
                 <form id="p2p-form" onsubmit="handleTradeSubmit(event)">
@@ -120,7 +120,7 @@
                         <input type="file" id="sell-file" accept="image/*" style="display: none;" onchange="updateFileLabel(this)">
                     </div>
 
-                    <button type="submit" id="submit-trade-btn" class="btn-generate" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); color: white;">Submit Buy Order</button>
+                    <button type="submit" id="submit-trade-btn" class="btn-generate" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); color: white; width: 100%; cursor: pointer;">Submit Buy Order</button>
                 </form>
             </section>
         </div>
@@ -149,7 +149,7 @@
                     <div id="order-status-box" class="status-badge status-pending">Pending 🟡</div>
                 </div>
                 <p id="status-note" style="font-size: 0.8rem; color: #a0aec0; line-height: 1.4;">እባክዎ ገጹን ሳይዘጉ ይጠብቁ...</p>
-                <button onclick="backToHome()" class="btn-generate" style="background-color: #334155; margin-top: 15px;">Back to Home</button>
+                <button type="button" onclick="backToHome()" class="btn-generate" style="background-color: #334155; margin-top: 15px;">Back to Home</button>
             </section>
         </div>
 
@@ -207,7 +207,7 @@
     </div>
 
     <script>
-        // 🔴 Firebase Configuration
+        // 🔴 Firebase Configuration (የራስህን እውነተኛ መረጃ እዚህ አስገባ)
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -227,6 +227,7 @@
         let isLoggedIn = false;
         let loggedInUserPhone = "";
         let globalCurrentOrderId = "";
+        let currentTradeType = 'buy';
 
         window.onload = function() {
             const savedUser = localStorage.getItem('currentUserPhone');
@@ -273,19 +274,23 @@
             localStorage.removeItem('currentUserPhone');
             updateAuthHeader();
             showNotification("ወጥተዋል!");
+            switchTab('home');
         }
 
         function switchTab(tabName) {
             document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
             document.querySelectorAll('.nav-tabs .tab').forEach(tab => tab.classList.remove('active'));
-            if(document.getElementById('page-' + tabName)) document.getElementById('page-' + tabName).style.display = 'block';
-            if(document.getElementById('tab-' + tabName)) document.getElementById('tab-' + tabName).classList.add('active');
+            
+            const selectedPage = document.getElementById('page-' + tabName);
+            const selectedTab = document.getElementById('tab-' + tabName);
+            
+            if(selectedPage) selectedPage.style.display = 'block';
+            if(selectedTab) selectedTab.classList.add('active');
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        let currentTradeType = 'buy';
         function setTradeType(type) {
             currentTradeType = type;
             const buyBtn = document.getElementById('trade-buy-btn');
@@ -299,6 +304,7 @@
                 buyBtn.style.backgroundColor = '#22c55e'; buyBtn.style.color = 'white';
                 sellBtn.style.backgroundColor = '#1a202e'; sellBtn.style.color = '#a0aec0';
                 submitBtn.innerText = "Submit Buy Order";
+                submitBtn.style.background = "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)";
                 dynamicLabel.innerText = "Your BEP20 Address (USDT መቀበያ አድራሻህ)";
                 dynamicInput.placeholder = "0x...";
                 screenshotArea.style.display = "none";
@@ -306,6 +312,7 @@
                 sellBtn.style.backgroundColor = '#ef4444'; sellBtn.style.color = 'white';
                 buyBtn.style.backgroundColor = '#1a202e'; buyBtn.style.color = '#a0aec0';
                 submitBtn.innerText = "Submit Sell Order";
+                submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
                 dynamicLabel.innerText = "Your Account/Phone Number (የብር መቀበያ ሂሳብ ቁጥር)";
                 dynamicInput.placeholder = "የባንክ ወይም የቴሌብር ቁጥር";
                 screenshotArea.style.display = "block";
@@ -324,9 +331,14 @@
             .catch(err => { showNotification("ፎቶ መላክ አልተቻለም!", true); });
         }
 
+        // 🔄 SUBMIT ሲጫን የሚሠራው ዋናው ክፍል
         function handleTradeSubmit(event) {
             event.preventDefault();
-            if(!isLoggedIn) { showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); openModal('login-modal'); return; }
+            if(!isLoggedIn) { 
+                showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); 
+                openModal('login-modal'); 
+                return; 
+            }
 
             const amount = document.getElementById('trade-amount').value;
             const method = document.getElementById('payment-method').value;
@@ -342,6 +354,7 @@
             const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
             globalCurrentOrderId = orderId;
 
+            // 1. መጀመሪያ ወደ Firebase መረጃውን መላክ
             database.ref('orders/' + orderId).set({
                 type: currentTradeType, amount: amount, method: method, phone: phone, dynamicData: dynamicValue, status: "pending"
             })
@@ -364,7 +377,21 @@
                         body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" })
                     });
                 }
+                
+                // ፎርሙን በባዶ ማጽዳት
+                document.getElementById('p2p-form').reset();
+                if(document.getElementById('sell-file')) {
+                    document.getElementById('sell-file').value = "";
+                    document.querySelector('.file-label').innerText = "📸 Select Screenshot Photo";
+                    document.querySelector('.file-label').style.borderColor = "#f3cd64";
+                }
+                
+                // ወደ መከታተያ ገጽ ማሳለፍ
                 startOrderStatusListener(orderId, currentTradeType, amount, method);
+            })
+            .catch((error) => {
+                showNotification("ዳታቤዝ ላይ መመዝገብ አልተቻለም!", true);
+                console.error(error);
             });
         }
 
@@ -378,15 +405,22 @@
         }
 
         function startOrderStatusListener(orderId, type, amount, method) {
+            // የላይኛውን ናቪጌሽን መደበቅ
             document.getElementById('main-nav').style.display = 'none';
+            
+            // የትዕዛዝ መረጃዎችን በጽሑፍ ማሳየት
             document.getElementById('status-id').innerText = orderId;
             document.getElementById('status-type').innerText = type;
             document.getElementById('status-amount').innerText = amount;
             document.getElementById('status-method').innerText = method;
 
+            // Buy ከሆነ የባንክ መመሪያውን ማሳየት
             document.getElementById('buy-payment-instruction').style.display = (type === 'buy') ? 'block' : 'none';
+            
+            // ገጹን ወደ 'status' መቀየር
             switchTab('status');
 
+            // በሪል-ታይም Firebase-ን መከታተል
             database.ref('orders/' + orderId + '/status').on('value', (snapshot) => {
                 const currentStatus = snapshot.val();
                 const statusBox = document.getElementById('order-status-box');
@@ -407,7 +441,10 @@
             });
         }
 
-        function backToHome() { document.getElementById('main-nav').style.display = 'flex'; switchTab('home'); }
+        function backToHome() { 
+            document.getElementById('main-nav').style.display = 'flex'; 
+            switchTab('home'); 
+        }
 
         function handleRegisterSubmit(event) {
             event.preventDefault();
