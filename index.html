@@ -133,7 +133,7 @@
                         </select>
                     </div>
 
-                    <div style="margin-bottom: 15px;">
+                    <div style="margin-bottom: 15px;" id="payment-method-row">
                         <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Payment Method (የክፍያ መንገድ)</label>
                         <select id="payment-method" style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                             <option value="telebirr">Telebirr (ቴሌብር)</option>
@@ -196,7 +196,7 @@
 
         <footer class="footer">
             <span>Forex P2P Squad © 2026</span>
-            <span>v3.3</span>
+            <span>v3.4</span>
         </footer>
     </div>
 
@@ -254,6 +254,8 @@
         window.onload = function() {
             const savedUser = localStorage.getItem('currentUserPhone');
             if (savedUser) { isLoggedIn = true; loggedInUserPhone = savedUser; updateAuthHeader(); }
+            // መጀመሪያ ገጹ ሲከፈት በዲፎልት buy ስለሆነ ሳጥኑን ደብቀን እንጀምር
+            document.getElementById('payment-method-row').style.display = 'none';
         };
 
         function showNotification(text, isError = false) {
@@ -320,7 +322,7 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // ⚡ የተቀየረ፡ Buy እና Sell ሲመረጥ ርዕሶችን እና አካውንቶችን ይቀያይራል
+        // ⚡ የተቀየረ፡ Buy ሲመረጥ የክፍያ መንገድ (Payment Method) ምርጫ ሳጥኑን ይደብቃል
         function setTradeType(type) {
             currentTradeType = type;
             const buyBtn = document.getElementById('trade-buy-btn');
@@ -331,11 +333,11 @@
             const buyAccountsBox = document.getElementById('buy-accounts-info');
             const sellAccountsBox = document.getElementById('sell-accounts-info');
             const platformRow = document.getElementById('crypto-platform-label').parentElement;
+            const paymentMethodRow = document.getElementById('payment-method-row');
             const screenshotTitle = document.getElementById('screenshot-title-label');
             const fileLabelBox = document.getElementById('file-label-box');
 
-            document.getElementById('trade-amount').value = "";
-            document.getElementById('trade-file').value = "";
+            document.getElementById('p2p-form').reset();
             fileLabelBox.innerText = "📸 Select Screenshot Photo";
             fileLabelBox.style.borderColor = "#f3cd64";
             calculateExchange();
@@ -348,6 +350,7 @@
                 buyAccountsBox.style.display = "block";
                 sellAccountsBox.style.display = "none";
                 platformRow.style.display = "block";
+                paymentMethodRow.style.display = "none"; // ⚡ Buy ሲሆን ይጠፋል
                 screenshotTitle.innerText = "Upload Payment Receipt (የባንክ ክፍያ ስክሪንሻት) *";
                 screenshotTitle.style.color = "#22c55e";
                 updateDynamicPlaceholder();
@@ -359,6 +362,7 @@
                 buyAccountsBox.style.display = "none";
                 sellAccountsBox.style.display = "block";
                 platformRow.style.display = "none";
+                paymentMethodRow.style.display = "block"; // ⚡ Sell ሲሆን መልሶ ይታያል
                 screenshotTitle.innerText = "Upload USDT Transfer Screenshot (ለእኛ የላክህበት ማረጋገጫ) *";
                 screenshotTitle.style.color = "#ef4444";
                 dynamicLabel.innerText = "Your Account Details (ብር የምንልክልህ የባንክ/ቴሌብር ስም እና ቁጥር)";
@@ -391,7 +395,6 @@
             const platform = document.getElementById('crypto-platform').value;
             const tradeFile = document.getElementById('trade-file').files[0];
 
-            // ⚡ አሁን ስክሪንሻት ለሁለቱም (Buy እና Sell) ግዴታ ነው
             if(!tradeFile) { 
                 showNotification("እባክዎ የክፍያ ወይም የዶላር ማስተላለፊያ ስክሪንሻት ያያይዙ!", true); 
                 return; 
@@ -401,20 +404,20 @@
             globalCurrentOrderId = orderId;
 
             let targetDestination = (currentTradeType === 'buy') ? `Platform: ${platform.toUpperCase()} (${dynamicValue})` : `User Bank Account: ${dynamicValue}`;
+            
+            // ⚡ የክፍያ መንገድ መግለጫ (ለBuy ከሆነ ከስክሪንሻት ይታያል፣ ለSell ከሆነ ደንበኛው የመረጠው ነው)
+            let paymentRouteText = (currentTradeType === 'buy') ? "ስክሪንሻቱን ይመልከቱ" : method.toUpperCase();
 
-            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ (ከስክሪንሻት ጋር) ደርሷል!*\n\n` +
+            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
                         `🆔 *Order ID:* \`${orderId}\`\n` +
                         `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
                         `💰 *የዶላር መጠን:* ${amount} USDT\n` +
                         `💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n` +
-                        `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
+                        `🏦 *ክፍያ መንገድ:* ${paymentRouteText}\n` +
                         `📞 *የደንበኛ ስልክ:* ${phone}\n` +
                         `🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
 
-            sendPhotoToTelegram(tradeFile, msg, orderId, currentTradeType, amount, method, targetDestination);
-            
-            document.getElementById('p2p-form').reset();
-            calculateExchange();
+            sendPhotoToTelegram(tradeFile, msg, orderId, currentTradeType, amount, paymentRouteText, targetDestination);
         }
 
         function startOrderStatusListener(orderId, type, amount, method, info) {
