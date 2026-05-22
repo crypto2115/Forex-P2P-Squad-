@@ -35,7 +35,7 @@
         .calc-highlight { color: #f3cd64; font-weight: bold; font-size: 1.1rem; }
 
         /* የአካውንት መረጃ ሳጥን */
-        .account-details-box { background: #1e293b; border: 1px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.5; }
+        .account-details-box { background: #1e293b; border: 1px solid #22c55e; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.5; }
         
         /* የአድሚን ማገናኛ ሊንክ ስታይል */
         .admin-link { display: inline-block; background-color: #0088cc; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 10px; font-size: 0.85rem; }
@@ -98,10 +98,17 @@
                     <button type="button" id="trade-sell-btn" onclick="setTradeType('sell')" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-weight: bold; background-color: #1a202e; color: #a0aec0; cursor: pointer;">Sell (ሽጥ)</button>
                 </div>
 
-                <div id="our-accounts-info" class="account-details-box" style="display: none;">
+                <div id="buy-accounts-info" class="account-details-box">
+                    <div style="color: #22c55e; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">⚠️ እባክዎ አስቀድመው በእነዚህ አካውንቶች ይክፈሉ፦</div>
+                    <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 3px;">📱 <strong>Telebirr:</strong> <span style="color: white; font-family: monospace;">0997370734</span> (Amir Yusuf Degene)</div>
+                    <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 5px;">🏦 <strong>CBE Bank:</strong> <span style="color: white; font-family: monospace;">1000731446052</span> (Semir Yusuf Degene)</div>
+                    <div style="border-top: 1px solid #334155; padding-top: 5px; color: #a0aec0;">ከታች ያለውን ፎርም ሲሞሉ የክፍያ ማረጋገጫ ስክሪንሻት ማያያዝ ግዴታ ነው።</div>
+                </div>
+
+                <div id="sell-accounts-info" class="account-details-box" style="display: none; border-color: #ef4444;">
                     <div style="color: #ef4444; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">⚠️ እባክዎ ቀድመው USDT በእዚህ አድራሻ ይላኩ፦</div>
                     <div style="background:#121620; padding:8px; border-radius:4px; font-family:monospace; color:#f3cd64; word-break:break-all; margin-bottom:8px; text-align:center;">0x396378d7721461813601a49fe2de0312a1f6034c</div>
-                    <div style="border-top: 1px solid #334155; padding-top: 5px;">እኛ ብር የምንልክልህ አካውንት መረጃ ከታች ሙላ።</div>
+                    <div style="border-top: 1px solid #334155; padding-top: 5px; color: #a0aec0;">እኛ ብር የምንልክልህ አካውንት መረጃ ከታች ሙላ።</div>
                 </div>
 
                 <form id="p2p-form" onsubmit="handleTradeSubmit(event)">
@@ -144,10 +151,10 @@
                         <input type="text" id="dynamic-input" placeholder="የመረጡት መድረክ መለያ (ID/Email) ያስገቡ" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                     </div>
 
-                    <div id="sell-screenshot-area" style="display: none; margin-bottom: 20px;">
-                        <label style="display: block; font-size: 0.85rem; color: #ef4444; margin-bottom: 5px;">Upload USDT Transfer Screenshot (ለእኛ የላክህበት ማረጋገጫ) *</label>
-                        <label class="file-label" for="sell-file">📸 Select Screenshot Photo</label>
-                        <input type="file" id="sell-file" accept="image/*" style="display: none;" onchange="updateFileLabel(this)">
+                    <div id="screenshot-upload-area" style="margin-bottom: 20px;">
+                        <label id="screenshot-title-label" style="display: block; font-size: 0.85rem; color: #22c55e; margin-bottom: 5px;">Upload Payment Receipt (የባንክ ክፍያ ስክሪንሻት) *</label>
+                        <label class="file-label" for="trade-file" id="file-label-box">📸 Select Screenshot Photo</label>
+                        <input type="file" id="trade-file" accept="image/*" style="display: none;" onchange="updateFileLabel(this)">
                     </div>
 
                     <button type="submit" id="submit-trade-btn" class="btn-generate" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%) !important; color: white; width: 100%; cursor: pointer;">Submit Buy Order</button>
@@ -166,24 +173,15 @@
                     <div><strong>Platform/Account:</strong> <span id="status-platform-detail" style="color: #38bdf8;">-</span></div>
                 </div>
 
-                <div id="buy-payment-instruction" style="display: none; background-color: #1a202e; padding: 15px; border-radius: 8px; border: 1px solid #22c55e; margin: 15px 0; text-align: left;">
-                    <div style="color: #22c55e; font-weight: bold; margin-bottom: 8px;">⚠️ እባክዎ አስቀድመው በእነዚህ አካውንቶች ይክፈሉ፦</div>
-                    <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 5px;">📱 <strong>Telebirr:</strong> <span style="color: white;">0997370734</span> (Amir Yusuf Degene)</div>
-                    <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 8px;">🏦 <strong>CBE Bank:</strong> <span style="color: white;">1000731446052</span> (Semir Yusuf Degene)</div>
-                    <div style="font-size: 0.85rem; color: #cbd5e1; border-top: 1px solid #334155; padding-top: 5px; margin-bottom: 5px;">ብር መላክዎን ሲጨርሱ ማረጋገጫ ስክሪንሻት እዚህ ይስቀሉ፦</div>
-                    
-                    <label class="file-label" for="buy-receipt-file" style="border-color: #22c55e; color: #4ade80;">📸 Upload Payment Receipt (የክፍያ ስክሪንሻት)</label>
-                    <input type="file" id="buy-receipt-file" accept="image/*" style="display: none;" onchange="uploadBuyReceipt()">
-                </div>
-
-                <div id="admin-contact-area" style="margin: 15px 0; padding: 10px; background-color: #1e293b; border-radius: 8px; border: 1px solid #38bdf8; display:none;">
-                    <div style="color: #38bdf8; font-weight: bold; font-size:0.9rem;">📢 ማረጋገጫ ደርሶናል! እባክዎ አድሚኑን ያናግሩ</div>
+                <div id="admin-contact-area" style="margin: 15px 0; padding: 15px; background-color: #1e293b; border-radius: 8px; border: 1px solid #38bdf8;">
+                    <div style="color: #38bdf8; font-weight: bold; font-size:0.9rem; margin-bottom: 5px;">📢 ክፍያዎ እና መረጃዎ በተሳካ ሁኔታ ደርሶናል!</div>
+                    <div style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 10px;">እባክዎ ትዕዛዝዎ ፈጣን ምላሽ እንዲያገኝ አድሚኑን በቴሌግራም ያናግሩ።</div>
                     <a href="https://t.me/CRYPTO2115" target="_blank" class="admin-link">📩 @CRYPTO2115 ያናግሩ</a>
                 </div>
 
                 <div style="margin: 20px 0;">
                     <div style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Current Status</div>
-                    <div id="order-status-box" class="status-badge status-pending">Pending 🟡</div>
+                    <div id="order-status-box" class="status-badge status-pending">Pending (ማረጋገጫ ተልኳል) 🟡</div>
                 </div>
                 <button type="button" onclick="backToHome()" class="btn-generate" style="background-color: #334155; margin-top: 15px;">Back to Home</button>
             </section>
@@ -192,13 +190,13 @@
         <div id="page-guide" class="page-section" style="display: none;">
             <section class="card">
                 <div class="card-title">📖 How to Trade</div>
-                <p style="color: #a0aec0; font-size: 0.9rem; line-height: 1.6;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ። የኔትወርክ ፊይ (Fee) ለመቀነስ የውስጥ ማስተላለፊያ ዘዴዎችን (Binance Pay, MEXC, Bybit, Bitget, Gate.io) ይጠቀሙ።</p>
+                <p style="color: #a0aec0; font-size: 0.9rem; line-height: 1.6;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ። Buy በሚያደርጉበት ጊዜ መጀመሪያ ክፍያውን ፈጽመው የክፍያ ማረጋገጫ ፎቶውን (Screenshot) ከፎርሙ ጋር በአንድ ላይ ማያያዝ ይኖርብዎታል።</p>
             </section>
         </div>
 
         <footer class="footer">
             <span>Forex P2P Squad © 2026</span>
-            <span>v3.2</span>
+            <span>v3.3</span>
         </footer>
     </div>
 
@@ -279,7 +277,6 @@
             calculatedETBGlobal = total;
         }
 
-        // ⚡ እንደ አዲሶቹ መድረኮች ምርጫ መግለጫዎቹን (Placeholders) በራስ-ሰር መቀየር
         function updateDynamicPlaceholder() {
             if (currentTradeType === 'sell') return;
             const platform = document.getElementById('crypto-platform').value;
@@ -323,6 +320,7 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        // ⚡ የተቀየረ፡ Buy እና Sell ሲመረጥ ርዕሶችን እና አካውንቶችን ይቀያይራል
         function setTradeType(type) {
             currentTradeType = type;
             const buyBtn = document.getElementById('trade-buy-btn');
@@ -330,11 +328,16 @@
             const submitBtn = document.getElementById('submit-trade-btn');
             const dynamicLabel = document.getElementById('dynamic-label');
             const dynamicInput = document.getElementById('dynamic-input');
-            const screenshotArea = document.getElementById('sell-screenshot-area');
-            const ourAccountsBox = document.getElementById('our-accounts-info');
+            const buyAccountsBox = document.getElementById('buy-accounts-info');
+            const sellAccountsBox = document.getElementById('sell-accounts-info');
             const platformRow = document.getElementById('crypto-platform-label').parentElement;
+            const screenshotTitle = document.getElementById('screenshot-title-label');
+            const fileLabelBox = document.getElementById('file-label-box');
 
             document.getElementById('trade-amount').value = "";
+            document.getElementById('trade-file').value = "";
+            fileLabelBox.innerText = "📸 Select Screenshot Photo";
+            fileLabelBox.style.borderColor = "#f3cd64";
             calculateExchange();
 
             if(type === 'buy') {
@@ -342,20 +345,24 @@
                 sellBtn.style.backgroundColor = '#1a202e'; sellBtn.style.color = '#a0aec0';
                 submitBtn.innerText = "Submit Buy Order";
                 submitBtn.style.background = "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)";
-                screenshotArea.style.display = "none";
-                ourAccountsBox.style.display = "none";
+                buyAccountsBox.style.display = "block";
+                sellAccountsBox.style.display = "none";
                 platformRow.style.display = "block";
+                screenshotTitle.innerText = "Upload Payment Receipt (የባንክ ክፍያ ስክሪንሻት) *";
+                screenshotTitle.style.color = "#22c55e";
                 updateDynamicPlaceholder();
             } else {
                 sellBtn.style.backgroundColor = '#ef4444'; sellBtn.style.color = 'white';
                 buyBtn.style.backgroundColor = '#1a202e'; buyBtn.style.color = '#a0aec0';
                 submitBtn.innerText = "Submit Sell Order";
                 submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
+                buyAccountsBox.style.display = "none";
+                sellAccountsBox.style.display = "block";
+                platformRow.style.display = "none";
+                screenshotTitle.innerText = "Upload USDT Transfer Screenshot (ለእኛ የላክህበት ማረጋገጫ) *";
+                screenshotTitle.style.color = "#ef4444";
                 dynamicLabel.innerText = "Your Account Details (ብር የምንልክልህ የባንክ/ቴሌብር ስም እና ቁጥር)";
                 dynamicInput.placeholder = "CBE - 1000... - ስም ያስገቡ";
-                screenshotArea.style.display = "block";
-                ourAccountsBox.style.display = "block";
-                platformRow.style.display = "none";
             }
         }
 
@@ -368,8 +375,8 @@
 
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
             .then(res => { 
-                showNotification("ስክሪንሻቱ በተሳካ ሁኔታ ተልኳል!"); 
-                startOrderStatusListener(orderId, type, amount, method, info, true);
+                showNotification("መረጃው እና ስክሪንሻቱ በተሳካ ሁኔታ ተልኳል!"); 
+                startOrderStatusListener(orderId, type, amount, method, info);
             });
         }
 
@@ -382,16 +389,20 @@
             const phone = document.getElementById('user-phone').value;
             const dynamicValue = document.getElementById('dynamic-input').value;
             const platform = document.getElementById('crypto-platform').value;
-            const sellFile = document.getElementById('sell-file').files[0];
+            const tradeFile = document.getElementById('trade-file').files[0];
 
-            if(currentTradeType === 'sell' && !sellFile) { showNotification("እባክዎ የ USDT ማስተላለፊያ ስክሪንሻት ያያይዙ!", true); return; }
+            // ⚡ አሁን ስክሪንሻት ለሁለቱም (Buy እና Sell) ግዴታ ነው
+            if(!tradeFile) { 
+                showNotification("እባክዎ የክፍያ ወይም የዶላር ማስተላለፊያ ስክሪንሻት ያያይዙ!", true); 
+                return; 
+            }
 
             const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
             globalCurrentOrderId = orderId;
 
             let targetDestination = (currentTradeType === 'buy') ? `Platform: ${platform.toUpperCase()} (${dynamicValue})` : `User Bank Account: ${dynamicValue}`;
 
-            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
+            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ (ከስክሪንሻት ጋር) ደርሷል!*\n\n` +
                         `🆔 *Order ID:* \`${orderId}\`\n` +
                         `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
                         `💰 *የዶላር መጠን:* ${amount} USDT\n` +
@@ -400,62 +411,19 @@
                         `📞 *የደንበኛ ስልክ:* ${phone}\n` +
                         `🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
 
-            if (currentTradeType === 'sell' && sellFile) {
-                sendPhotoToTelegram(sellFile, msg, orderId, currentTradeType, amount, method, targetDestination);
-            } else {
-                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-                fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" })
-                })
-                .then(() => {
-                    showNotification("ትዕዛዝዎ ተልኳል! ክፍያ ይጠብቃል...");
-                    startOrderStatusListener(orderId, currentTradeType, amount, method, targetDestination, false);
-                });
-            }
+            sendPhotoToTelegram(tradeFile, msg, orderId, currentTradeType, amount, method, targetDestination);
             
             document.getElementById('p2p-form').reset();
             calculateExchange();
         }
 
-        function uploadBuyReceipt() {
-            const fileInput = document.getElementById('buy-receipt-file');
-            const file = fileInput.files[0];
-            if(!file) return;
-            
-            fileInput.previousElementSibling.innerText = "✅ Sent: " + file.name;
-            const msg = `💵 *የክፍያ ማረጋገጫ ስክሪንሻት ደርሷል!*\n\n🆔 *Order ID:* \`${globalCurrentOrderId}\`\nደንበኛው ለአድሚን መክፈሉን የሚገልጽ ፎቶ ልኳል።`;
-            
-            const formData = new FormData();
-            formData.append("chat_id", CHAT_ID);
-            formData.append("photo", file);
-            formData.append("caption", msg);
-            formData.append("parse_mode", "Markdown");
-            
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
-            .then(() => { 
-                showNotification("የክፍያ ማረጋገጫው ደርሷል!");
-                document.getElementById('admin-contact-area').style.display = 'block';
-                document.getElementById('order-status-box').innerText = "Pending (ማረጋገጫ ተልኳል) 🟡";
-            });
-        }
-
-        function startOrderStatusListener(orderId, type, amount, method, info, hasScreenshot) {
+        function startOrderStatusListener(orderId, type, amount, method, info) {
             document.getElementById('main-nav').style.display = 'none';
             document.getElementById('status-id').innerText = orderId;
             document.getElementById('status-type').innerText = type;
             document.getElementById('status-amount').innerText = amount;
             document.getElementById('status-calculated-etb').innerText = calculatedETBGlobal.toLocaleString();
             document.getElementById('status-platform-detail').innerText = info;
-
-            if (type === 'buy') {
-                document.getElementById('buy-payment-instruction').style.display = 'block';
-                document.getElementById('admin-contact-area').style.display = hasScreenshot ? 'block' : 'none';
-            } else {
-                document.getElementById('buy-payment-instruction').style.display = 'none';
-                document.getElementById('admin-contact-area').style.display = 'block';
-            }
 
             switchTab('status');
         }
