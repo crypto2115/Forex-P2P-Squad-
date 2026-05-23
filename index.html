@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex P2P Squad - Admin Panel v2.4.1</title>
+    <title>Forex P2P Squad - Admin Panel v2.4.2</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* ማሳወቂያ ሳጥን */
@@ -94,7 +94,7 @@
                 <div class="card-title">📈 Live USDT P2P Rates (የዛሬ ተመን)</div>
                 <div class="rate-row">
                     <span class="rate-label">🔄 Sell (የምንገዛበት ዋጋ)</span>
-                    <span class="rate-value"><span id="ui-rate-under">170</span> ETB</span>
+                    <span class="rate-value"><span id="ui-rate-under">189</span> ETB</span>
                 </div>
                 <div class="rate-row">
                     <span class="rate-label">🛒 Buy (የምንሸጥበት ዋጋ)</span>
@@ -149,7 +149,7 @@
                         <input type="number" id="trade-amount" placeholder="መጠን አስገባ" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;" oninput="calculateExchange()">
                         
                         <div class="calc-box">
-                            Rate: <span id="calc-rate" style="color: #4ade80;">170</span> ETB | 
+                            Rate: <span id="calc-rate" style="color: #4ade80;">175</span> ETB | 
                             Total: <span id="calc-total" class="calc-highlight">0.00</span> ETB
                         </div>
                     </div>
@@ -261,7 +261,7 @@
                     <div class="admin-grid-inputs">
                         <div>
                             <label style="font-size:0.75rem; color:#a0aec0;">Sell Rate (የምንገዛበት)</label>
-                            <input type="number" id="adm-rate-under" value="170">
+                            <input type="number" id="adm-rate-under" value="189">
                         </div>
                         <div>
                             <label style="font-size:0.75rem; color:#a0aec0;">Buy Rate (የምንሸጥበት)</label>
@@ -312,7 +312,7 @@
 
         <footer class="footer" style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
             <span>Forex P2P Squad © 2026</span>
-            <span style="font-size: 0.75rem; color: #64748b;">v2.4.1</span>
+            <span style="font-size: 0.75rem; color: #64748b;">v2.4.2</span>
         </footer>
     </div>
 
@@ -379,7 +379,7 @@
         const BOT_TOKEN = "8686967610:AAFE1B_hTR6JMljJQbnntitty842ZclQN1g";
         const CHAT_ID = "6758067257";
         const REAL_BEP20_ADDRESS = "0x396378d7721461813601a49fe2de0312a1f6034c";
-        const SUPER_ADMIN_PHONE = "0997370734"; // 👑 የዋናው ባለቤት ስልክ
+        const SUPER_ADMIN_PHONE = "0997370734"; 
 
         let isLoggedIn = false;
         let loggedInUserPhone = "";
@@ -388,8 +388,8 @@
         let currentTradeType = 'buy';
         let calculatedETBGlobal = 0;
 
-        let rateUnder10 = parseFloat(localStorage.getItem('rateUnder10')) || 170;
-        let rateOver10 = parseFloat(localStorage.getItem('rateOver10')) || 175;
+        let rateUnder10 = parseFloat(localStorage.getItem('rateUnder10')) || 189; // Sell (የምንገዛበት)
+        let rateOver10 = parseFloat(localStorage.getItem('rateOver10')) || 175;  // Buy (የምንሸጥበት)
 
         window.onload = function() {
             initMockDatabase();
@@ -482,6 +482,7 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
+        // 🛠️ የተስተካከለው የዋጋ ማሰያ ፈንክሽን
         function calculateExchange() {
             const amountInput = document.getElementById('trade-amount').value;
             const rateLabel = document.getElementById('calc-rate');
@@ -489,7 +490,9 @@
             if(!amountInput || amountInput <= 0) { if(totalLabel) totalLabel.innerText = "0.00"; calculatedETBGlobal = 0; return; }
             const amount = parseFloat(amountInput);
             
-            let rate = (amount >= 10) ? rateOver10 : rateUnder10;
+            // 🔄 ማስተካከያ፦ Buy ሲሆን rateOver10 (175)፣ Sell ሲሆን rateUnder10 (189) ይወስዳል
+            let rate = (currentTradeType === 'buy') ? rateOver10 : rateUnder10;
+            
             if(rateLabel) rateLabel.innerText = rate;
             const total = amount * rate;
             if(totalLabel) totalLabel.innerText = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -581,7 +584,6 @@
                 fileLabelBox.innerText = "📸 Select Screenshot Photo";
                 fileLabelBox.style.borderColor = "#f3cd64";
             }
-            calculateExchange();
 
             if(type === 'buy') {
                 buyBtn.style.backgroundColor = '#22c55e'; buyBtn.style.color = 'white';
@@ -617,6 +619,9 @@
                 if(dynamicLabel) dynamicLabel.innerText = "Your Account Details (ብር የምንልክልህ የባንክ/ቴሌብር ስም እና ቁጥር)";
                 if(dynamicInput) dynamicInput.placeholder = "CBE - 1000... - ስም ያስገቡ";
             }
+            
+            // 🔄 መለወጫ ቁልፎቹ ሲጫኑ ወዲያውኑ ሂሳቡን በታለመለት ዋጋ እንዲያሰላ ጥሪ ይደረጋል
+            calculateExchange();
         }
 
         function handleTradeSubmit(event) {
@@ -764,19 +769,17 @@
             }
         }
 
-        // --- 🔒 EXCLUSIVE: ADMIN LOGIN SUBMIT (ደህንነቱ የተጠበቀ) ---
+        // --- 🔒 EXCLUSIVE: ADMIN LOGIN SUBMIT ---
         function handleAdminLoginSubmit(event) {
             event.preventDefault();
             const phone = document.getElementById('admin-phone').value;
             const pass = document.getElementById('admin-pass').value;
 
-            // 🔑 አንተ የወሰንከው ሚስጥራዊ ቁልፍ
             const SECRET_ADMIN_KEY = "565670"; 
 
             let users = JSON.parse(localStorage.getItem('usersDb')) || [];
             let foundUser = users.find(u => u.phone === phone);
 
-            // 🛡️ ማረጋገጫ፡ ስልኩ እና ሚስጥራዊ ቁልፉ በትክክል መክተማቸውን ያረጋግጣል
             if ((phone === SUPER_ADMIN_PHONE && pass === SECRET_ADMIN_KEY) || 
                 (foundUser && foundUser.role === 'sub-admin' && pass === SECRET_ADMIN_KEY)) {
                 
@@ -818,7 +821,7 @@
             determineUserRole(phone); updateAuthHeader();
 
             closeModal('register-modal');
-            showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
+            showNotification("በተሳካ ሁኔታ ተመዝገበዋል!");
         }
 
         function handleLoginSubmit(event) {
