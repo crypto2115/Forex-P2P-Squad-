@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex P2P Squad</title>
+    <title>Forex P2P Squad - Admin Panel v2.3.0</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* ማሳወቂያ ሳጥን */
@@ -23,29 +23,46 @@
         }
         .toast-notification.show { transform: translateX(-50%) translateY(0); }
         
-        /* የትዕዛዝ ሁኔታ ባጆች */
         .status-badge { display: inline-block; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; margin-top: 10px; }
         .status-pending { background-color: #f59e0b; color: #1e1b4b; }
         
-        /* የስክሪንሻት ፋይል መምረጫ ስታይል */
         .file-label { display: block; padding: 12px; background: #232d3f; border: 1px dashed #f3cd64; text-align: center; border-radius: 8px; color: #f3cd64; cursor: pointer; font-weight: bold; font-size: 0.85rem; margin-top: 5px; }
-        
-        /* የሂሳብ ማሳያ ሳጥን */
         .calc-box { background: #121620; border: 1px solid #334155; padding: 10px; border-radius: 8px; margin-top: 5px; font-size: 0.9rem; }
         .calc-highlight { color: #f3cd64; font-weight: bold; font-size: 1.1rem; }
-
-        /* የአካውንት መረጃ ሳጥን */
         .account-details-box { background: #1e293b; border: 1px solid #22c55e; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.5; }
-        
-        /* የአድሚን ማገናኛ ሊንክ ስታይል */
         .admin-link { display: inline-block; background-color: #0088cc; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 10px; font-size: 0.85rem; }
 
-        /* ለ Guide ገጽ አዲስ ስታይል */
+        /* Guide Styles */
         .guide-step { background-color: #121620; border-left: 4px solid #f3cd64; padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 15px; text-align: left; }
         .guide-step-title { font-weight: bold; color: #f3cd64; margin-bottom: 5px; font-size: 0.95rem; }
         .guide-text { color: #cbd5e1; font-size: 0.85rem; line-height: 1.6; margin: 0; }
         .badge-buy { background-color: #22c55e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
         .badge-sell { background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+
+        /* 🛡️ Admin Dashboard Styles */
+        .admin-section-title { font-size: 1.1rem; color: #f3cd64; margin: 20px 0 10px 0; border-bottom: 1px solid #334155; padding-bottom: 5px; font-weight: bold; }
+        .admin-grid-inputs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .admin-grid-inputs input { flex: 1; padding: 10px; background: #121620; border: 1px solid #334155; color: white; border-radius: 6px; }
+        
+        /* Tables for Orders and Users */
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; text-align: left; }
+        .admin-table th, .admin-table td { padding: 10px; border: 1px solid #334155; color: #cbd5e1; }
+        .admin-table th { background-color: #121620; color: #f3cd64; }
+        
+        .btn-action { padding: 4px 8px; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: bold; cursor: pointer; color: white; }
+        .btn-approve { background-color: #22c55e; }
+        .btn-reject { background-color: #ef4444; margin-left: 5px; }
+        .btn-role-sub { background-color: #38bdf8; color: #0f172a; }
+        .btn-role-user { background-color: #64748b; }
+        
+        .role-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        .role-super { background-color: #f59e0b; color: #1e1b4b; }
+        .role-sub { background-color: #38bdf8; color: #0f172a; }
+        .role-user { background-color: #475569; color: #cbd5e1; }
+
+        /* 🛡️ አዲስ የአድሚን ሎጊን ቁልፍ ስታይል */
+        .btn-admin-login { background-color: #7f1d1d; color: #fca5a5; border: 1px solid #b91c1c; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.3s; }
+        .btn-admin-login:hover { background-color: #b91c1c; color: white; }
     </style>
 </head>
 <body>
@@ -61,6 +78,7 @@
             <div class="auth-buttons" id="auth-area">
                 <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
                 <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
+                <button class="btn-admin-login" onclick="openModal('admin-login-modal')">🛡️ Admin Login</button>
             </div>
         </header>
 
@@ -68,13 +86,14 @@
             <div class="tab active" id="tab-home" onclick="switchTab('home')">🏠 Home</div>
             <div class="tab" id="tab-trade" onclick="switchTab('trade')">🔄 P2P Trade</div>
             <div class="tab" id="tab-guide" onclick="switchTab('guide')">📖 Guide</div>
+            <div class="tab" id="tab-admin" onclick="switchTab('admin')" style="display: none; background-color: #7f1d1d; color: #fca5a5;">🛡️ Admin Panel</div>
         </nav>
 
         <div id="page-home" class="page-section">
             <section class="card">
                 <div class="card-title">📈 Withdrawal Rate (USDT)</div>
-                <div class="rate-row"><span class="rate-label">SELL USDT</span><span class="rate-value">175 ETB</span></div>
-                <div class="rate-row"><span class="rate-label">BUY USDT</span><span class="rate-value">187 ETB</span></div>
+                <div class="rate-row"><span class="rate-label">Under 10 USDT</span><span class="rate-value"><span id="ui-rate-under">170</span> ETB</span></div>
+                <div class="rate-row"><span class="rate-label">10+ USDT</span><span class="rate-value"><span id="ui-rate-over">175</span> ETB</span></div>
             </section>
             
             <section class="card">
@@ -124,7 +143,7 @@
                         <input type="number" id="trade-amount" placeholder="መጠን አስገባ" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #121620; border: 1px solid #334155; color: white; box-sizing: border-box;" oninput="calculateExchange()">
                         
                         <div class="calc-box">
-                            Rate: <span id="calc-rate" style="color: #4ade80;">175</span> ETB | 
+                            Rate: <span id="calc-rate" style="color: #4ade80;">170</span> ETB | 
                             Total: <span id="calc-total" class="calc-highlight">0.00</span> ETB
                         </div>
                     </div>
@@ -196,7 +215,7 @@
                 
                 <div class="guide-step">
                     <div class="guide-step-title">ደረጃ 1፦ መለያ መክፈት ወይም መግባት (Auth)</div>
-                    <p class="guide-text">በመጀመሪያ ከላይ በቀኝ በኩል ያለውን <strong>Register</strong> በመጫን በስምዎ እና በስልክ ቁጥርዎ ይመዝገቡ። አካውንት ካለዎት <strong>Login</strong> የሚለውን በመጫን ይግቡ። (ሳይገቡ ትዕዛዝ ማለፍ አይቻልም)።</p>
+                    <p class="guide-text">በመጀመሪያ ከላይ በቀኝ በኩል ያለውን <strong>Register</strong> በመጫን በስምዎ እና በስልክ ቁጥርዎ ይመዝገቡ። አካውንት ካለዎት <strong>Login</strong> የሚለውን በመጫን ይግቡ።</p>
                 </div>
 
                 <div class="guide-step">
@@ -207,26 +226,74 @@
                 <div class="guide-step">
                     <div class="guide-step-title">ደረጃ 3፦ መረጃዎችን መሙላት</div>
                     <p class="guide-text">
-                        • <strong>Buy (ሲገዙ)፦</strong> መግዛት የሚፈልጉትን የዶላር (USDT) መጠን ያስገቡ። ሲስተሙ የሚከፍሉትን ጠቅላላ የኢትዮጵያ ብር ያሰላልዎታል። በመቀጠል አረንጓዴው ሳጥን ውስጥ ወደተጠቀሱት የቴሌብር ወይም የንግድ ባንክ አካውንቶቻችን ብሩን ያስተላልፉ።<br>
-                        • <strong>Sell (ሲሸጡ)፦</strong> መሸጥ የሚፈልጉትን የዶላር መጠን ያስገቡ እና ቀይ ሳጥን ውስጥ ባለው የክሪፕቶ አድራሻችን ላይ USDT ይላኩ። በመቀጠል ብር እንዲላክለዎት የሚፈልጉትን የባንክ አካውንት መረጃ ያስገቡ።
+                        • <strong>Buy (ሲገዙ)፦</strong> መግዛት የሚፈልጉትን የዶላር (USDT) መጠን ያስገቡ። ሲስተሙ የሚከፍሉትን ጠቅላላ የኢትዮጵያ ብር ያሰላልዎታል። በመቀጠል አካውንቶቻችን ላይ ብሩን ያስተላልፉ።<br>
+                        • <strong>Sell (ሲሸጡ)፦</strong> መሸጥ የሚፈልጉትን የዶላር መጠን ያስገቡ እና በእኛ የክሪፕቶ አድራሻ ላይ USDT ይላኩ። በመቀጠል ብር እንዲላክለዎት የሚፈልጉትን የባንክ አካውንት ያስገቡ።
                     </p>
                 </div>
+            </section>
+        </div>
 
-                <div class="guide-step">
-                    <div class="guide-step-title">ደረጃ 4፦ ማረጋገጫ (Screenshot) ማያያዝ እና መላክ</div>
-                    <p class="guide-text">ክፍያ የፈጸሙበትን ወይም ዶላር ያስተላለፉበትን ደረሰኝ ፎቶ (Screenshot) በጥንቃቄ ያያይዙ። ከዚያም <strong>Submit Order</strong> የሚለውን ይጫኑ። ትዕዛዝዎ በቀጥታ ወደ እኛ ይደርሳል።</p>
+        <div id="page-admin" class="page-section" style="display: none;">
+            <section class="card">
+                <div class="card-title">🛡️ Admin Control Dashboard</div>
+                
+                <div id="admin-rate-control-box">
+                    <div class="admin-section-title">💲 የዶላር ዋጋ መቀየሪያ (Update Live USDT Rates)</div>
+                    <div class="admin-grid-inputs">
+                        <div>
+                            <label style="font-size:0.75rem; color:#a0aec0;">Under 10 USDT</label>
+                            <input type="number" id="adm-rate-under" value="170">
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem; color:#a0aec0;">10+ USDT</label>
+                            <input type="number" id="adm-rate-over" value="175">
+                        </div>
+                    </div>
+                    <button type="button" onclick="updateLiveRates()" class="btn-generate" style="background-color:#22c55e; padding:10px;">Save & Update Rates</button>
                 </div>
 
-                <div class="guide-step">
-                    <div class="guide-step-title">ደረጃ 5፦ ማረጋገጫ እና አድሚንን ማናገር</div>
-                    <p class="guide-text">ትዕዛዙ እንደተላከ የትዕዛዝ መከታተያ ገጽ ይከፈትልዎታል። እዚያ ላይ ያለውን <strong>@CRYPTO2115 ያናግሩ</strong> የሚለውን ሊንክ በመጫን በቴሌግራም አድሚኑን ቶሎ እንዲያረጋግጥልዎት መልእክት መላክ ይችላሉ።</p>
+                <div class="admin-section-title">📥 የደረሱ የ P2P ትዕዛዞች (Incoming Orders)</div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Total ETB</th>
+                                <th>Platform/Account</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table-body">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div id="admin-users-control-box">
+                    <div class="admin-section-title">👥 የተመዘገቡ ተጠቃሚዎች ዝርዝር (Registered Users List)</div>
+                    <div style="overflow-x: auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Current Role</th>
+                                    <th>Action (ስልጣን ለመስጠት)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-table-body">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </div>
 
         <footer class="footer" style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
             <span>Forex P2P Squad © 2026</span>
-            <span style="font-size: 0.75rem; color: #64748b;">v2.1.1</span>
+            <span style="font-size: 0.75rem; color: #64748b;">v2.3.0</span>
         </footer>
     </div>
 
@@ -255,7 +322,7 @@
     <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
         <div style="background-color: #1a202e; border: 1px solid #334155; width: 90%; max-width: 380px; padding: 25px; border-radius: 12px; position: relative; box-sizing: border-box;">
             <span onclick="closeModal('login-modal')" style="position: absolute; top: 15px; right: 15px; color: #a0aec0; cursor: pointer; font-size: 1.2rem;">&times;</span>
-            <h3 style="margin-top: 0; color: white;">🔐 Sign In</h3>
+            <h3 style="margin-top: 0; color: white;">🔐 Sign In (User)</h3>
             <form id="login-form" onsubmit="handleLoginSubmit(event)">
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; font-size: 0.8rem; color: #a0aec0; margin-bottom: 5px;">PHONE NUMBER</label>
@@ -270,22 +337,114 @@
         </div>
     </div>
 
+    <div id="admin-login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background-color: #1e1b4b; border: 2px solid #b91c1c; width: 90%; max-width: 380px; padding: 25px; border-radius: 12px; position: relative; box-sizing: border-box;">
+            <span onclick="closeModal('admin-login-modal')" style="position: absolute; top: 15px; right: 15px; color: #f87171; cursor: pointer; font-size: 1.2rem;">&times;</span>
+            <h3 style="margin-top: 0; color: #fca5a5; display: flex; align-items: center; gap: 8px;">🛡️ Secure Admin Access</h3>
+            <p style="font-size:0.75rem; color:#fca5a5; margin-bottom:15px;">ይህ መግቢያ ለባለቤቱ እና ለተፈቀደላቸው ረዳቶች ብቻ የተዘጋጀ ነው።</p>
+            <form id="admin-login-form" onsubmit="handleAdminLoginSubmit(event)">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.8rem; color: #fca5a5; margin-bottom: 5px;">ADMIN PHONE NUMBER</label>
+                    <input type="tel" id="admin-phone" placeholder="09..." required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #0f172a; border: 1px solid #7f1d1d; color: white; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 0.8rem; color: #fca5a5; margin-bottom: 5px;">SECRET ACCESS KEY</label>
+                    <input type="password" id="admin-pass" placeholder="••••••••" required style="width: 100%; padding: 12px; border-radius: 8px; background-color: #0f172a; border: 1px solid #7f1d1d; color: white; box-sizing: border-box;">
+                </div>
+                <button type="submit" style="width: 100%; background-color: #b91c1c; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Authenticate Admin 🔑</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         const BOT_TOKEN = "8686967610:AAFE1B_hTR6JMljJQbnntitty842ZclQN1g";
         const CHAT_ID = "6758067257";
         const REAL_BEP20_ADDRESS = "0x396378d7721461813601a49fe2de0312a1f6034c";
+        const SUPER_ADMIN_PHONE = "0997370734"; // 👑 የዋናው ባለቤት ስልክ
 
         let isLoggedIn = false;
         let loggedInUserPhone = "";
+        let userRole = "user"; 
         let globalCurrentOrderId = "";
         let currentTradeType = 'buy';
         let calculatedETBGlobal = 0;
 
+        let rateUnder10 = parseFloat(localStorage.getItem('rateUnder10')) || 170;
+        let rateOver10 = parseFloat(localStorage.getItem('rateOver10')) || 175;
+
         window.onload = function() {
+            initMockDatabase();
+            updateUIRatesDisplays();
+
             const savedUser = localStorage.getItem('currentUserPhone');
-            if (savedUser) { isLoggedIn = true; loggedInUserPhone = savedUser; updateAuthHeader(); }
+            if (savedUser) { 
+                isLoggedIn = true; 
+                loggedInUserPhone = savedUser; 
+                determineUserRole(savedUser);
+                updateAuthHeader(); 
+            }
             document.getElementById('payment-method-row').style.display = 'none';
         };
+
+        function initMockDatabase() {
+            if(!localStorage.getItem('usersDb')) {
+                let defaultUsers = [
+                    { name: "Semir Yusuf", phone: "0997370734", role: "super-admin" },
+                    { name: "Abebe Kebede", phone: "0911223344", role: "user" }
+                ];
+                localStorage.setItem('usersDb', JSON.stringify(defaultUsers));
+            }
+            if(!localStorage.getItem('ordersDb')) {
+                localStorage.setItem('ordersDb', JSON.stringify([]));
+            }
+        }
+
+        function determineUserRole(phone) {
+            let users = JSON.parse(localStorage.getItem('usersDb')) || [];
+            let foundUser = users.find(u => u.phone === phone);
+            
+            if (phone === SUPER_ADMIN_PHONE) {
+                userRole = "super-admin";
+            } else if (foundUser && foundUser.role === "sub-admin") {
+                userRole = "sub-admin";
+            } else {
+                userRole = "user";
+            }
+
+            const adminTab = document.getElementById('tab-admin');
+            if(userRole === 'super-admin' || userRole === 'sub-admin') {
+                adminTab.style.display = 'block';
+                renderAdminDashboard();
+            } else {
+                adminTab.style.display = 'none';
+            }
+        }
+
+        function updateUIRatesDisplays() {
+            document.getElementById('ui-rate-under').innerText = rateUnder10;
+            document.getElementById('ui-rate-over').innerText = rateOver10;
+            document.getElementById('adm-rate-under').value = rateUnder10;
+            document.getElementById('adm-rate-over').value = rateOver10;
+        }
+
+        function updateLiveRates() {
+            if(userRole !== 'super-admin') {
+                showNotification("የዋጋ ተመን ለመቀየር የ Super Admin ስልጣን ያስፈልጋል!", true);
+                return;
+            }
+            let under = parseFloat(document.getElementById('adm-rate-under').value);
+            let over = parseFloat(document.getElementById('adm-rate-over').value);
+            
+            if(under > 0 && over > 0) {
+                rateUnder10 = under;
+                rateOver10 = over;
+                localStorage.setItem('rateUnder10', under);
+                localStorage.setItem('rateOver10', over);
+                updateUIRatesDisplays();
+                calculateExchange();
+                showNotification("የዶላር ዋጋ በቅጽበት ተቀይሯል! 🟢");
+            }
+        }
 
         function showNotification(text, isError = false) {
             const toast = document.getElementById('toast');
@@ -301,7 +460,8 @@
             const totalLabel = document.getElementById('calc-total');
             if(!amountInput || amountInput <= 0) { totalLabel.innerText = "0.00"; calculatedETBGlobal = 0; return; }
             const amount = parseFloat(amountInput);
-            let rate = (amount >= 10) ? 175 : 170;
+            
+            let rate = (amount >= 10) ? rateOver10 : rateUnder10;
             rateLabel.innerText = rate;
             const total = amount * rate;
             totalLabel.innerText = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -331,13 +491,27 @@
         function updateAuthHeader() {
             const authArea = document.getElementById('auth-area');
             if(isLoggedIn) {
-                authArea.innerHTML = `<span style="color: #4ade80; font-size: 0.85rem; font-weight: bold; margin-right: 10px;">👤 ${loggedInUserPhone}</span><button onclick="handleLogout()" style="background-color: #334155; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Logout</button>`;
+                let roleText = (userRole === 'super-admin') ? "👑 Admin" : (userRole === 'sub-admin' ? "📱 Staff" : "👤 User");
+                authArea.innerHTML = `<span style="color: #4ade80; font-size: 0.85rem; font-weight: bold; margin-right: 10px;">${roleText}: ${loggedInUserPhone}</span><button onclick="handleLogout()" style="background-color: #334155; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Logout</button>`;
             } else {
-                authArea.innerHTML = `<button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button><button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>`;
+                authArea.innerHTML = `
+                    <button class="btn-login" onclick="openModal('login-modal')">Login (ግባ)</button>
+                    <button class="btn-register" onclick="openModal('register-modal')">Register (ተመዝገብ)</button>
+                    <button class="btn-admin-login" onclick="openModal('admin-login-modal')">🛡️ Admin Login</button>
+                `;
             }
         }
 
-        function handleLogout() { isLoggedIn = false; loggedInUserPhone = ""; localStorage.removeItem('currentUserPhone'); updateAuthHeader(); showNotification("ወጥተዋል!"); switchTab('home'); }
+        function handleLogout() { 
+            isLoggedIn = false; 
+            loggedInUserPhone = ""; 
+            userRole = "user";
+            localStorage.removeItem('currentUserPhone'); 
+            updateAuthHeader(); 
+            document.getElementById('tab-admin').style.display = 'none';
+            showNotification("ወጥተዋል!"); 
+            switchTab('home'); 
+        }
 
         function switchTab(tabName) {
             document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
@@ -346,6 +520,8 @@
             const selectedTab = document.getElementById('tab-' + tabName);
             if(selectedPage) selectedPage.style.display = 'block';
             if(selectedTab) selectedTab.classList.add('active');
+
+            if(tabName === 'admin') { renderAdminDashboard(); }
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -383,111 +559,4 @@
                 screenshotTitle.style.color = "#22c55e";
                 updateDynamicPlaceholder();
             } else {
-                sellBtn.style.backgroundColor = '#ef4444'; sellBtn.style.color = 'white';
-                buyBtn.style.backgroundColor = '#1a202e'; buyBtn.style.color = '#a0aec0';
-                submitBtn.innerText = "Submit Sell Order";
-                submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
-                buyAccountsBox.style.display = "none";
-                sellAccountsBox.style.display = "block";
-                platformRow.style.display = "none";
-                paymentMethodRow.style.display = "block";
-                screenshotTitle.innerText = "Upload USDT Transfer Screenshot (ለእኛ የላክህበት ማረጋገጫ) *";
-                screenshotTitle.style.color = "#ef4444";
-                dynamicLabel.innerText = "Your Account Details (ብር የምንልክልህ የባንክ/ቴሌብር ስም እና ቁጥር)";
-                dynamicInput.placeholder = "CBE - 1000... - ስም ያስገቡ";
-            }
-        }
-
-        function sendPhotoToTelegram(file, captionText, orderId, type, amount, method, info) {
-            const formData = new FormData();
-            formData.append("chat_id", CHAT_ID);
-            formData.append("photo", file);
-            formData.append("caption", captionText);
-            formData.append("parse_mode", "Markdown");
-
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
-            .then(res => { 
-                showNotification("መረጃው እና ስክሪንሻቱ በተሳካ ሁኔታ ተልኳል!"); 
-                startOrderStatusListener(orderId, type, amount, method, info);
-            });
-        }
-
-        function handleTradeSubmit(event) {
-            event.preventDefault();
-            if(!isLoggedIn) { showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); openModal('login-modal'); return; }
-
-            const amount = document.getElementById('trade-amount').value;
-            const method = document.getElementById('payment-method').value;
-            const dynamicValue = document.getElementById('dynamic-input').value;
-            const platform = document.getElementById('crypto-platform').value;
-            const tradeFile = document.getElementById('trade-file').files[0];
-
-            if(!tradeFile) { 
-                showNotification("እባክዎ የክፍያ ወይም የዶላር ማስተላለፊያ ስክሪንሻት ያያይዙ!", true); 
-                return; 
-            }
-
-            const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-            globalCurrentOrderId = orderId;
-
-            let targetDestination = (currentTradeType === 'buy') ? `Platform: ${platform.toUpperCase()} (${dynamicValue})` : `User Bank Account: ${dynamicValue}`;
-            let paymentRouteText = (currentTradeType === 'buy') ? "ስክሪንሻቱን ይመልከቱ" : method.toUpperCase();
-
-            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n` +
-                        `🆔 *Order ID:* \`${orderId}\`\n` +
-                        `👤 *አይነት:* ${currentTradeType.toUpperCase()}\n` +
-                        `💰 *የዶላር መጠን:* ${amount} USDT\n` +
-                        `💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n` +
-                        `🏦 *ክፍያ መንገድ:* ${paymentRouteText}\n` +
-                        `📞 *የደንበኛ ስልክ:* ${loggedInUserPhone}\n` +
-                        `🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
-
-            sendPhotoToTelegram(tradeFile, msg, orderId, currentTradeType, amount, paymentRouteText, targetDestination);
-        }
-
-        function startOrderStatusListener(orderId, type, amount, method, info) {
-            document.getElementById('main-nav').style.display = 'none';
-            document.getElementById('status-id').innerText = orderId;
-            document.getElementById('status-type').innerText = type;
-            document.getElementById('status-amount').innerText = amount;
-            document.getElementById('status-calculated-etb').innerText = calculatedETBGlobal.toLocaleString();
-            document.getElementById('status-platform-detail').innerText = info;
-
-            switchTab('status');
-        }
-
-        function backToHome() { document.getElementById('main-nav').style.display = 'flex'; switchTab('home'); }
-
-        function handleRegisterSubmit(event) {
-            event.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            const pass = document.getElementById('reg-pass').value;
-            const msg = `📝 *አዲስ ተጠቃሚ ተመዝግቧል!*\n\n👤 *ስም:* ${name}\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
-            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('register-modal'); showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
-        }
-
-        function handleLoginSubmit(event) {
-            event.preventDefault();
-            const phone = document.getElementById('login-phone').value;
-            const pass = document.getElementById('login-pass').value;
-            const msg = `🔐 *የግባ (Login) ሙከራ*\n\n📞 *ስልክ:* ${phone}\n🔑 *ይለፍ ቃል:* \`${pass}\``;
-            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone); updateAuthHeader();
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
-            closeModal('login-modal'); showNotification("እንኳን ደህና መጡ!");
-        }
-
-        document.getElementById('generate-btn').addEventListener('click', function() {
-            const addressDisplay = document.getElementById('address-display');
-            const instruction = document.getElementById('address-instruction');
-            addressDisplay.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px; color: #f3cd64; word-break: break-all;">${REAL_BEP20_ADDRESS}</div><button id="copy-btn" type="button" style="background-color: #232d3f; color: #f3cd64; border: 1px solid #f3cd64; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">📋 Copy Address</button>`;
-            addressDisplay.style.display = 'block'; instruction.innerText = "USDT መላኪያ አድራሻችን፦"; this.innerText = "Done!";
-            document.getElementById('copy-btn').addEventListener('click', function() {
-                navigator.clipboard.writeText(REAL_BEP20_ADDRESS).then(() => { this.innerText = "✅ Copied!"; setTimeout(() => { this.innerText = "📋 Copy Address"; }, 2000); });
-            });
-        });
-    </script>
-</body>
-</html>
+                sellBtn.style.backgroundColor = '#ef4444'; sellBtn.
