@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex P2P Squad - Admin Panel v2.3.1</title>
+    <title>Forex P2P Squad - Admin Panel v2.4.0</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* ማሳወቂያ ሳጥን */
@@ -91,9 +91,15 @@
 
         <div id="page-home" class="page-section">
             <section class="card">
-                <div class="card-title">📈 Withdrawal Rate (USDT)</div>
-                <div class="rate-row"><span class="rate-label">Under 10 USDT</span><span class="rate-value"><span id="ui-rate-under">170</span> ETB</span></div>
-                <div class="rate-row"><span class="rate-label">10+ USDT</span><span class="rate-value"><span id="ui-rate-over">175</span> ETB</span></div>
+                <div class="card-title">📈 Live USDT P2P Rates (የዛሬ ተመን)</div>
+                <div class="rate-row">
+                    <span class="rate-label">🔄 Sell (የምንገዛበት ዋጋ)</span>
+                    <span class="rate-value"><span id="ui-rate-under">170</span> ETB</span>
+                </div>
+                <div class="rate-row">
+                    <span class="rate-label">🛒 Buy (የምንሸጥበት ዋጋ)</span>
+                    <span class="rate-value"><span id="ui-rate-over">175</span> ETB</span>
+                </div>
             </section>
             
             <section class="card">
@@ -233,11 +239,11 @@
                     <div class="admin-section-title">💲 የዶላር ዋጋ መቀየሪያ (Update Live USDT Rates)</div>
                     <div class="admin-grid-inputs">
                         <div>
-                            <label style="font-size:0.75rem; color:#a0aec0;">Under 10 USDT</label>
+                            <label style="font-size:0.75rem; color:#a0aec0;">Sell Rate (የምንገዛበት)</label>
                             <input type="number" id="adm-rate-under" value="170">
                         </div>
                         <div>
-                            <label style="font-size:0.75rem; color:#a0aec0;">10+ USDT</label>
+                            <label style="font-size:0.75rem; color:#a0aec0;">Buy Rate (የምንሸጥበት)</label>
                             <input type="number" id="adm-rate-over" value="175">
                         </div>
                     </div>
@@ -285,7 +291,7 @@
 
         <footer class="footer" style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
             <span>Forex P2P Squad © 2026</span>
-            <span style="font-size: 0.75rem; color: #64748b;">v2.3.1</span>
+            <span style="font-size: 0.75rem; color: #64748b;">v2.4.0</span>
         </footer>
     </div>
 
@@ -622,7 +628,7 @@
             });
             localStorage.setItem('ordersDb', JSON.stringify(orders));
 
-            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n🆔 *Order ID:* \`${orderId}\`\n👤 *አይነት:* ${currentTradeType.toUpperCase()}\n💰 *የዶላር መጠን:* ${amount} USDT\n💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n🏦 *ክፍያ መንገድ:* ${paymentRouteText}\n📞 *የደንበኛ ስልክ:* ${loggedInUserPhone}\n🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
+            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n🆔 *Order ID:* \`${orderId}\`\n👤 *አይነት:* ${currentTradeType.toUpperCase()}\n💰 *የዶላር መጠን:* ${amount} USDT\n💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n🏦 *ክፍያ መንገድ:* ${paymentRouteText}\n📞 *የደንበኛ ስልክ:* ${loggedInUserPhone}\n🔑 *የመድረክ መፈላጊ:* \`${targetDestination}\``;
 
             const formData = new FormData();
             formData.append("chat_id", CHAT_ID);
@@ -737,17 +743,22 @@
             }
         }
 
-        // --- 🔒 EXCLUSIVE: ADMIN LOGIN SUBMIT ---
+        // --- 🔒 EXCLUSIVE: ADMIN LOGIN SUBMIT (ደህንነቱ የተጠበቀ) ---
         function handleAdminLoginSubmit(event) {
             event.preventDefault();
             const phone = document.getElementById('admin-phone').value;
             const pass = document.getElementById('admin-pass').value;
 
+            // 🔑 አንተ የወሰንከው ሚስጥራዊ ቁልፍ
+            const SECRET_ADMIN_KEY = "565670"; 
+
             let users = JSON.parse(localStorage.getItem('usersDb')) || [];
             let foundUser = users.find(u => u.phone === phone);
 
-            // ሴኪውሪቲ ሩል፡ ስልኩ አድሚን ወይም ሱፐር አድሚን መሆኑን ማረጋገጥ
-            if(phone === SUPER_ADMIN_PHONE || (foundUser && foundUser.role === 'sub-admin')) {
+            // 🛡️ ማረጋገጫ፡ ስልኩ እና ሚስጥራዊ ቁልፉ በትክክል መክተማቸውን ያረጋግጣል
+            if ((phone === SUPER_ADMIN_PHONE && pass === SECRET_ADMIN_KEY) || 
+                (foundUser && foundUser.role === 'sub-admin' && pass === SECRET_ADMIN_KEY)) {
+                
                 isLoggedIn = true;
                 loggedInUserPhone = phone;
                 localStorage.setItem('currentUserPhone', phone);
@@ -755,15 +766,17 @@
                 updateAuthHeader();
 
                 const msg = `🛡️ *የአድሚን መግቢያ ተሳክቷል!*\n\n📞 *ስልክ:* ${phone}\n📊 *ደረጃ:* ${userRole.toUpperCase()}`;
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) 
+                });
 
                 closeModal('admin-login-modal');
                 showNotification("እንኳን ደህና መጡ አድሚን! 🛡️");
-                
-                // ወደ አድሚን ገጽ ቀጥታ መውሰጃ የተስተካከለ ስክሪፕት
                 switchTab('admin'); 
             } else {
-                showNotification("ይቅርታ፣ ይህ ስልክ ቁጥር የአድሚን ፈቃድ የለውም! ❌", true);
+                showNotification("ይቅርታ፣ የስልክ ቁጥር ወይም ሚስጥራዊ ቁልፍ ስህተት ነው! ❌", true);
             }
         }
 
