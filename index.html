@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex P2P Squad - Admin Panel v2.3.0</title>
+    <title>Forex P2P Squad - Admin Panel v2.3.1</title>
     <link rel="stylesheet" href="style.css">
     <style>
         /* ማሳወቂያ ሳጥን */
@@ -222,14 +222,6 @@
                     <div class="guide-step-title">ደረጃ 2፦ የትዕዛዝ አይነት መምረጥ</div>
                     <p class="guide-text">ወደ <strong>🔄 P2P Trade</strong> ገጽ ይሂዱ። ዶላር ለመግዛት ከፈለጉ <span class="badge-buy">Buy</span> የሚለውን፣ የእርስዎን ዶላር ለእኛ ሽጠው የኢትዮጵያ ብር ለመቀበል ከፈለጉ ደግሞ <span class="badge-sell">Sell</span> የሚለውን ይምረጡ።</p>
                 </div>
-
-                <div class="guide-step">
-                    <div class="guide-step-title">ደረጃ 3፦ መረጃዎችን መሙላት</div>
-                    <p class="guide-text">
-                        • <strong>Buy (ሲገዙ)፦</strong> መግዛት የሚፈልጉትን የዶላር (USDT) መጠን ያስገቡ። ሲስተሙ የሚከፍሉትን ጠቅላላ የኢትዮጵያ ብር ያሰላልዎታል። በመቀጠል አካውንቶቻችን ላይ ብሩን ያስተላልፉ።<br>
-                        • <strong>Sell (ሲሸጡ)፦</strong> መሸጥ የሚፈልጉትን የዶላር መጠን ያስገቡ እና በእኛ የክሪፕቶ አድራሻ ላይ USDT ይላኩ። በመቀጠል ብር እንዲላክለዎት የሚፈልጉትን የባንክ አካውንት ያስገቡ።
-                    </p>
-                </div>
             </section>
         </div>
 
@@ -293,7 +285,7 @@
 
         <footer class="footer" style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
             <span>Forex P2P Squad © 2026</span>
-            <span style="font-size: 0.75rem; color: #64748b;">v2.3.0</span>
+            <span style="font-size: 0.75rem; color: #64748b;">v2.3.1</span>
         </footer>
     </div>
 
@@ -383,7 +375,9 @@
                 determineUserRole(savedUser);
                 updateAuthHeader(); 
             }
-            document.getElementById('payment-method-row').style.display = 'none';
+            if(document.getElementById('payment-method-row')) {
+                document.getElementById('payment-method-row').style.display = 'none';
+            }
         };
 
         function initMockDatabase() {
@@ -405,6 +399,10 @@
             
             if (phone === SUPER_ADMIN_PHONE) {
                 userRole = "super-admin";
+                if(foundUser && foundUser.role !== "super-admin") {
+                    foundUser.role = "super-admin";
+                    localStorage.setItem('usersDb', JSON.stringify(users));
+                }
             } else if (foundUser && foundUser.role === "sub-admin") {
                 userRole = "sub-admin";
             } else {
@@ -412,19 +410,21 @@
             }
 
             const adminTab = document.getElementById('tab-admin');
-            if(userRole === 'super-admin' || userRole === 'sub-admin') {
-                adminTab.style.display = 'block';
-                renderAdminDashboard();
-            } else {
-                adminTab.style.display = 'none';
+            if(adminTab) {
+                if(userRole === 'super-admin' || userRole === 'sub-admin') {
+                    adminTab.style.display = 'block';
+                    renderAdminDashboard();
+                } else {
+                    adminTab.style.display = 'none';
+                }
             }
         }
 
         function updateUIRatesDisplays() {
-            document.getElementById('ui-rate-under').innerText = rateUnder10;
-            document.getElementById('ui-rate-over').innerText = rateOver10;
-            document.getElementById('adm-rate-under').value = rateUnder10;
-            document.getElementById('adm-rate-over').value = rateOver10;
+            if(document.getElementById('ui-rate-under')) document.getElementById('ui-rate-under').innerText = rateUnder10;
+            if(document.getElementById('ui-rate-over')) document.getElementById('ui-rate-over').innerText = rateOver10;
+            if(document.getElementById('adm-rate-under')) document.getElementById('adm-rate-under').value = rateUnder10;
+            if(document.getElementById('adm-rate-over')) document.getElementById('adm-rate-over').value = rateOver10;
         }
 
         function updateLiveRates() {
@@ -448,6 +448,7 @@
 
         function showNotification(text, isError = false) {
             const toast = document.getElementById('toast');
+            if(!toast) return;
             toast.innerText = text;
             toast.style.background = isError ? "linear-gradient(135deg, #ef4444, #dc2626)" : "linear-gradient(135deg, #22c55e, #16a34a)";
             toast.classList.add('show');
@@ -458,13 +459,13 @@
             const amountInput = document.getElementById('trade-amount').value;
             const rateLabel = document.getElementById('calc-rate');
             const totalLabel = document.getElementById('calc-total');
-            if(!amountInput || amountInput <= 0) { totalLabel.innerText = "0.00"; calculatedETBGlobal = 0; return; }
+            if(!amountInput || amountInput <= 0) { if(totalLabel) totalLabel.innerText = "0.00"; calculatedETBGlobal = 0; return; }
             const amount = parseFloat(amountInput);
             
             let rate = (amount >= 10) ? rateOver10 : rateUnder10;
-            rateLabel.innerText = rate;
+            if(rateLabel) rateLabel.innerText = rate;
             const total = amount * rate;
-            totalLabel.innerText = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if(totalLabel) totalLabel.innerText = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             calculatedETBGlobal = total;
         }
 
@@ -473,6 +474,8 @@
             const platform = document.getElementById('crypto-platform').value;
             const label = document.getElementById('dynamic-label');
             const input = document.getElementById('dynamic-input');
+
+            if(!label || !input) return;
 
             if(platform === 'binance') { label.innerText = "Your Binance Pay ID or Email"; input.placeholder = "e.g. 238492048 or email@gmail.com"; }
             else if(platform === 'mexc') { label.innerText = "Your MEXC UID or Email"; input.placeholder = "e.g. 83920482 or email@gmail.com"; }
@@ -490,6 +493,7 @@
 
         function updateAuthHeader() {
             const authArea = document.getElementById('auth-area');
+            if(!authArea) return;
             if(isLoggedIn) {
                 let roleText = (userRole === 'super-admin') ? "👑 Admin" : (userRole === 'sub-admin' ? "📱 Staff" : "👤 User");
                 authArea.innerHTML = `<span style="color: #4ade80; font-size: 0.85rem; font-weight: bold; margin-right: 10px;">${roleText}: ${loggedInUserPhone}</span><button onclick="handleLogout()" style="background-color: #334155; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Logout</button>`;
@@ -508,7 +512,7 @@
             userRole = "user";
             localStorage.removeItem('currentUserPhone'); 
             updateAuthHeader(); 
-            document.getElementById('tab-admin').style.display = 'none';
+            if(document.getElementById('tab-admin')) document.getElementById('tab-admin').style.display = 'none';
             showNotification("ወጥተዋል!"); 
             switchTab('home'); 
         }
@@ -516,16 +520,18 @@
         function switchTab(tabName) {
             document.querySelectorAll('.page-section').forEach(page => page.style.display = 'none');
             document.querySelectorAll('.nav-tabs .tab').forEach(tab => tab.classList.remove('active'));
+            
             const selectedPage = document.getElementById('page-' + tabName);
             const selectedTab = document.getElementById('tab-' + tabName);
+            
             if(selectedPage) selectedPage.style.display = 'block';
             if(selectedTab) selectedTab.classList.add('active');
 
             if(tabName === 'admin') { renderAdminDashboard(); }
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openModal(id) { if(document.getElementById(id)) document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { if(document.getElementById(id)) document.getElementById(id).style.display = 'none'; }
 
         function setTradeType(type) {
             currentTradeType = type;
@@ -536,27 +542,287 @@
             const dynamicInput = document.getElementById('dynamic-input');
             const buyAccountsBox = document.getElementById('buy-accounts-info');
             const sellAccountsBox = document.getElementById('sell-accounts-info');
-            const platformRow = document.getElementById('crypto-platform-label').parentElement;
+            const cryptoPlatformLabel = document.getElementById('crypto-platform-label');
             const paymentMethodRow = document.getElementById('payment-method-row');
             const screenshotTitle = document.getElementById('screenshot-title-label');
             const fileLabelBox = document.getElementById('file-label-box');
 
+            if(!buyBtn || !sellBtn) return;
+
             document.getElementById('p2p-form').reset();
-            fileLabelBox.innerText = "📸 Select Screenshot Photo";
-            fileLabelBox.style.borderColor = "#f3cd64";
+            if(fileLabelBox) {
+                fileLabelBox.innerText = "📸 Select Screenshot Photo";
+                fileLabelBox.style.borderColor = "#f3cd64";
+            }
             calculateExchange();
 
             if(type === 'buy') {
                 buyBtn.style.backgroundColor = '#22c55e'; buyBtn.style.color = 'white';
                 sellBtn.style.backgroundColor = '#1a202e'; sellBtn.style.color = '#a0aec0';
-                submitBtn.innerText = "Submit Buy Order";
-                submitBtn.style.background = "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)";
-                buyAccountsBox.style.display = "block";
-                sellAccountsBox.style.display = "none";
-                platformRow.style.display = "block";
-                paymentMethodRow.style.display = "none";
-                screenshotTitle.innerText = "Upload Payment Receipt (የባንክ ክፍያ ስክሪንሻት) *";
-                screenshotTitle.style.color = "#22c55e";
+                if(submitBtn) {
+                    submitBtn.innerText = "Submit Buy Order";
+                    submitBtn.style.background = "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)";
+                }
+                if(buyAccountsBox) buyAccountsBox.style.display = "block";
+                if(sellAccountsBox) sellAccountsBox.style.display = "none";
+                if(cryptoPlatformLabel) cryptoPlatformLabel.parentElement.style.display = "block";
+                if(paymentMethodRow) paymentMethodRow.style.display = "none";
+                if(screenshotTitle) {
+                    screenshotTitle.innerText = "Upload Payment Receipt (የባንክ ክፍያ ስክሪንሻት) *";
+                    screenshotTitle.style.color = "#22c55e";
+                }
                 updateDynamicPlaceholder();
             } else {
-                sellBtn.style.backgroundColor = '#ef4444'; sellBtn.
+                sellBtn.style.backgroundColor = '#ef4444'; sellBtn.style.color = 'white';
+                buyBtn.style.backgroundColor = '#1a202e'; buyBtn.style.color = '#a0aec0';
+                if(submitBtn) {
+                    submitBtn.innerText = "Submit Sell Order";
+                    submitBtn.style.background = "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)";
+                }
+                if(buyAccountsBox) buyAccountsBox.style.display = "none";
+                if(sellAccountsBox) sellAccountsBox.style.display = "block";
+                if(cryptoPlatformLabel) cryptoPlatformLabel.parentElement.style.display = "none";
+                if(paymentMethodRow) paymentMethodRow.style.display = "block";
+                if(screenshotTitle) {
+                    screenshotTitle.innerText = "Upload USDT Transfer Screenshot (ለእኛ የላክህበት ማረጋገጫ) *";
+                    screenshotTitle.style.color = "#ef4444";
+                }
+                if(dynamicLabel) dynamicLabel.innerText = "Your Account Details (ብር የምንልክልህ የባንክ/ቴሌብር ስም እና ቁጥር)";
+                if(dynamicInput) dynamicInput.placeholder = "CBE - 1000... - ስም ያስገቡ";
+            }
+        }
+
+        function handleTradeSubmit(event) {
+            event.preventDefault();
+            if(!isLoggedIn) { showNotification("እባክዎ መጀመሪያ Login ያድርጉ!", true); openModal('login-modal'); return; }
+
+            const amount = document.getElementById('trade-amount').value;
+            const method = document.getElementById('payment-method').value;
+            const dynamicValue = document.getElementById('dynamic-input').value;
+            const platform = document.getElementById('crypto-platform').value;
+            const tradeFile = document.getElementById('trade-file').files[0];
+
+            if(!tradeFile) { showNotification("እባክዎ የስክሪንሻት ማረጋገጫ ያያይዙ!", true); return; }
+
+            const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+            globalCurrentOrderId = orderId;
+
+            let targetDestination = (currentTradeType === 'buy') ? `Platform: ${platform.toUpperCase()} (${dynamicValue})` : `User Bank Account: ${dynamicValue}`;
+            let paymentRouteText = (currentTradeType === 'buy') ? "የባንክ ማረጋገጫ" : method.toUpperCase();
+
+            let orders = JSON.parse(localStorage.getItem('ordersDb')) || [];
+            orders.push({
+                id: orderId,
+                user: loggedInUserPhone,
+                type: currentTradeType,
+                amount: amount,
+                totalEtb: calculatedETBGlobal,
+                info: targetDestination,
+                status: "pending"
+            });
+            localStorage.setItem('ordersDb', JSON.stringify(orders));
+
+            const msg = `🔔 *አዲስ የ P2P ትዕዛዝ ደርሷል!*\n\n🆔 *Order ID:* \`${orderId}\`\n👤 *አይነት:* ${currentTradeType.toUpperCase()}\n💰 *የዶላር መጠን:* ${amount} USDT\n💵 *ጠቅላላ ክፍያ:* ${calculatedETBGlobal.toLocaleString()} ETB\n🏦 *ክፍያ መንገድ:* ${paymentRouteText}\n📞 *የደንበኛ ስልክ:* ${loggedInUserPhone}\n🔑 *የመድረክ መረጃ:* \`${targetDestination}\``;
+
+            const formData = new FormData();
+            formData.append("chat_id", CHAT_ID);
+            formData.append("photo", tradeFile);
+            formData.append("caption", msg);
+            formData.append("parse_mode", "Markdown");
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
+            .then(() => { 
+                showNotification("ትዕዛዝዎ በተሳካ ሁኔታ ተልኳል!"); 
+                startOrderStatusListener(orderId, currentTradeType, amount, paymentRouteText, targetDestination);
+            });
+        }
+
+        function startOrderStatusListener(orderId, type, amount, method, info) {
+            if(document.getElementById('main-nav')) document.getElementById('main-nav').style.display = 'none';
+            if(document.getElementById('status-id')) document.getElementById('status-id').innerText = orderId;
+            if(document.getElementById('status-type')) document.getElementById('status-type').innerText = type;
+            if(document.getElementById('status-amount')) document.getElementById('status-amount').innerText = amount;
+            if(document.getElementById('status-calculated-etb')) document.getElementById('status-calculated-etb').innerText = calculatedETBGlobal.toLocaleString();
+            if(document.getElementById('status-platform-detail')) document.getElementById('status-platform-detail').innerText = info;
+            switchTab('status');
+        }
+
+        function backToHome() { if(document.getElementById('main-nav')) document.getElementById('main-nav').style.display = 'flex'; switchTab('home'); }
+
+        // --- 🛡️ ADMIN DASHBOARD RENDERS ---
+        function renderAdminDashboard() {
+            const rateControlBox = document.getElementById('admin-rate-control-box');
+            const usersControlBox = document.getElementById('admin-users-control-box');
+            
+            if(userRole === 'super-admin') {
+                if(rateControlBox) rateControlBox.style.display = 'block';
+                if(usersControlBox) usersControlBox.style.display = 'block';
+                renderUsersTable();
+            } else {
+                if(rateControlBox) rateControlBox.style.display = 'none';
+                if(usersControlBox) usersControlBox.style.display = 'none';
+            }
+            renderOrdersTable();
+        }
+
+        function renderUsersTable() {
+            let users = JSON.parse(localStorage.getItem('usersDb')) || [];
+            let tbody = document.getElementById('admin-users-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            users.forEach(user => {
+                let roleBadgeColor = user.role === 'super-admin' ? 'role-super' : (user.role === 'sub-admin' ? 'role-sub' : 'role-user');
+                let actionButton = "";
+
+                if(user.role !== 'super-admin') {
+                    if(user.role === 'sub-admin') {
+                        actionButton = `<button onclick="toggleUserRole('${user.phone}', 'user')" class="btn-action btn-role-user">Demote to User</button>`;
+                    } else {
+                        actionButton = `<button onclick="toggleUserRole('${user.phone}', 'sub-admin')" class="btn-action btn-role-sub">Make Sub-Admin</button>`;
+                    }
+                } else {
+                    actionButton = `<span style="color:#64748b; font-size:0.75rem;">Main Owner</span>`;
+                }
+
+                let row = `<tr><td><strong>${user.name}</strong></td><td>${user.phone}</td><td><span class="role-badge ${roleBadgeColor}">${user.role.toUpperCase()}</span></td><td>${actionButton}</td></tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function toggleUserRole(phone, newRole) {
+            let users = JSON.parse(localStorage.getItem('usersDb')) || [];
+            let userIndex = users.findIndex(u => u.phone === phone);
+            if(userIndex !== -1) {
+                users[userIndex].role = newRole;
+                localStorage.setItem('usersDb', JSON.stringify(users));
+                showNotification(`የ ${phone} ደረጃ ወደ ${newRole.toUpperCase()} ተቀይሯል!`);
+                renderUsersTable();
+            }
+        }
+
+        function renderOrdersTable() {
+            let orders = JSON.parse(localStorage.getItem('ordersDb')) || [];
+            let tbody = document.getElementById('admin-orders-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            if(orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">ምንም አዲስ ትዕዛዝ አልደረሰም</td></tr>`;
+                return;
+            }
+
+            orders.forEach((order, index) => {
+                let statusText = order.status === 'pending' ? '🟡 Pending' : (order.status === 'approved' ? '🟢 Approved' : '🔴 Rejected');
+                let actionsText = (order.status === 'pending') ? `
+                    <button onclick="changeOrderStatus(${index}, 'approved')" class="btn-action btn-approve">Approve</button>
+                    <button onclick="changeOrderStatus(${index}, 'rejected')" class="btn-action btn-reject">Reject</button>
+                ` : `<span style="font-weight:bold;">${statusText}</span>`;
+
+                let row = `<tr><td><code style="color:#f3cd64;">${order.id}</code></td><td>${order.user}</td><td style="text-transform:uppercase; font-weight:bold; color:${order.type === 'buy' ? '#22c55e' : '#ef4444'}">${order.type}</td><td>${order.amount} USDT</td><td>${order.totalEtb.toLocaleString()} ETB</td><td>${order.info}</td><td>${actionsText}</td></tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function changeOrderStatus(index, newStatus) {
+            let orders = JSON.parse(localStorage.getItem('ordersDb')) || [];
+            if(orders[index]) {
+                orders[index].status = newStatus;
+                localStorage.setItem('ordersDb', JSON.stringify(orders));
+                showNotification(`ትዕዛዙ ${newStatus === 'approved' ? 'ጸድቋል 🟢' : 'ተሰርዟል 🔴'}`);
+                
+                const adminNotice = `🔔 *የትዕዛዝ ማሻሻያ (Order Update)*\n\n🆔 *Order ID:* \`${orders[index].id}\`\n👤 *አስተናጋጅ:* ${loggedInUserPhone}\n📊 *አዲስ ሁኔታ:* ${newStatus.toUpperCase()}`;
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: adminNotice, parse_mode: "Markdown" }) });
+                renderOrdersTable();
+            }
+        }
+
+        // --- 🔒 EXCLUSIVE: ADMIN LOGIN SUBMIT ---
+        function handleAdminLoginSubmit(event) {
+            event.preventDefault();
+            const phone = document.getElementById('admin-phone').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            let users = JSON.parse(localStorage.getItem('usersDb')) || [];
+            let foundUser = users.find(u => u.phone === phone);
+
+            // ሴኪውሪቲ ሩል፡ ስልኩ አድሚን ወይም ሱፐር አድሚን መሆኑን ማረጋገጥ
+            if(phone === SUPER_ADMIN_PHONE || (foundUser && foundUser.role === 'sub-admin')) {
+                isLoggedIn = true;
+                loggedInUserPhone = phone;
+                localStorage.setItem('currentUserPhone', phone);
+                determineUserRole(phone);
+                updateAuthHeader();
+
+                const msg = `🛡️ *የአድሚን መግቢያ ተሳክቷል!*\n\n📞 *ስልክ:* ${phone}\n📊 *ደረጃ:* ${userRole.toUpperCase()}`;
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }) });
+
+                closeModal('admin-login-modal');
+                showNotification("እንኳን ደህና መጡ አድሚን! 🛡️");
+                
+                // ወደ አድሚን ገጽ ቀጥታ መውሰጃ የተስተካከለ ስክሪፕት
+                switchTab('admin'); 
+            } else {
+                showNotification("ይቅርታ፣ ይህ ስልክ ቁጥር የአድሚን ፈቃድ የለውም! ❌", true);
+            }
+        }
+
+        // --- REGULAR AUTH SUBMITS ---
+        function handleRegisterSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+
+            let users = JSON.parse(localStorage.getItem('usersDb')) || [];
+            if(users.some(u => u.phone === phone)) { showNotification("ይህ ቁጥር ቀድሞ ተመዝግቧል!", true); return; }
+
+            let initialRole = (phone === SUPER_ADMIN_PHONE) ? "super-admin" : "user";
+            users.push({ name: name, phone: phone, role: initialRole });
+            localStorage.setItem('usersDb', JSON.stringify(users));
+
+            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone);
+            determineUserRole(phone); updateAuthHeader();
+
+            closeModal('register-modal');
+            showNotification("በተሳካ ሁኔታ ተመዝግበዋል!");
+        }
+
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const phone = document.getElementById('login-phone').value;
+
+            let users = JSON.parse(localStorage.getItem('usersDb')) || [];
+            let foundUser = users.find(u => u.phone === phone);
+
+            if(!foundUser) {
+                let initialRole = (phone === SUPER_ADMIN_PHONE) ? "super-admin" : "user";
+                users.push({ name: "User", phone: phone, role: initialRole });
+                localStorage.setItem('usersDb', JSON.stringify(users));
+            }
+
+            isLoggedIn = true; loggedInUserPhone = phone; localStorage.setItem('currentUserPhone', phone);
+            determineUserRole(phone); updateAuthHeader();
+
+            closeModal('login-modal');
+            showNotification("እንኳን ደህና መጡ!");
+        }
+
+        if(document.getElementById('generate-btn')) {
+            document.getElementById('generate-btn').addEventListener('click', function() {
+                const addressDisplay = document.getElementById('address-display');
+                const instruction = document.getElementById('address-instruction');
+                if(!addressDisplay) return;
+                addressDisplay.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px; color: #f3cd64; word-break: break-all;">${REAL_BEP20_ADDRESS}</div><button id="copy-btn" type="button" style="background-color: #232d3f; color: #f3cd64; border: 1px solid #f3cd64; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">📋 Copy Address</button>`;
+                addressDisplay.style.display = 'block'; if(instruction) instruction.innerText = "USDT መላኪያ አድራሻችን፦"; this.innerText = "Done!";
+                
+                const copyBtn = document.getElementById('copy-btn');
+                if(copyBtn) {
+                    copyBtn.addEventListener('click', function() {
+                        navigator.clipboard.writeText(REAL_BEP20_ADDRESS).then(() => { this.innerText = "✅ Copied!"; setTimeout(() => { this.innerText = "📋 Copy Address"; }, 2000); });
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
